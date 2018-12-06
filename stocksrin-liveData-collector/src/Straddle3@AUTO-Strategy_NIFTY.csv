@@ -1,0 +1,7 @@
+strategySerial,expiry,type,strike,close_price,quantity,target,stopLoss,spot_close,desc,status,traded_IV,tradedDate
+1,27DEC2018,PUT,10550.0,155.0,-75,800.0,-1000.0,10600.7,Automated Trade,false,20.19,06DEC2018
+2,27DEC2018,CALL,10550.0,224.4,-75,800.0,-1000.0,10600.7,Automated Trade,false,16.22,06DEC2018
+1,27DEC2018,PUT,10600.0,175.75,-75,800.0,-1000.0,10600.7,Automated Trade,false,20.08,06DEC2018
+2,27DEC2018,CALL,10600.0,195.5,-75,800.0,-1000.0,10600.7,Automated Trade,false,16.39,06DEC2018
+1,27DEC2018,PUT,10650.0,196.95,-75,800.0,-1000.0,10600.7,Automated Trade,false,19.77,06DEC2018
+2,27DEC2018,CALL,10650.0,168.55,-75,800.0,-1000.0,10600.7,Automated Trade,false,16.3,06DEC2018
