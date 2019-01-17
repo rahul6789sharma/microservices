@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 import org.stocksrin.common.utils.Scheduler;
 import org.stocksrin.strategies.automation.InMemeoryStrategyBuilder;
 import org.stocksrin.strategies.automation.InMemeoryStrategyDataUpdater;
+import org.stocksrin.strategies.automation.InMemeoryStrategyDataUpdaterUSDINR;
 import org.stocksrin.strategies.builder.file.BNFStrategyBuilderDaily;
 import org.stocksrin.strategies.builder.file.IntraDayStrategyFileBuilder;
+import org.stocksrin.strategies.builder.file.USDINRStrategyDailyBuilder;
 
 @Service
 public class SchedulerEveningService {
@@ -27,6 +29,12 @@ public class SchedulerEveningService {
 	@Autowired(required = true)
 	private InMemeoryStrategyDataUpdater inMemeoryStrategyDataUpdater;
 
+	@Autowired(required = true)
+	private InMemeoryStrategyDataUpdaterUSDINR inMemeoryStrategyDataUpdaterUSDINR;
+
+	@Autowired(required = true)
+	private USDINRStrategyDailyBuilder usdINRStrategyDailyBuilder;
+
 	@PostConstruct
 	public void init() {
 
@@ -34,6 +42,13 @@ public class SchedulerEveningService {
 
 		try {
 			Scheduler.scheduleTask(9, 21, intraDayStrategyFileBuilder);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		try {
+			// update the price of in Memories startegies
+			Scheduler.scheduleTask(9, 22, inMemeoryStrategyDataUpdaterUSDINR);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -54,6 +69,12 @@ public class SchedulerEveningService {
 
 		try {
 			Scheduler.scheduleTask(15, 25, bnfStrategyBuilderDaily);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		try {
+			Scheduler.scheduleTask(10, 10, usdINRStrategyDailyBuilder);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

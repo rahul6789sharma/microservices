@@ -7,7 +7,6 @@ import java.util.TimerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.stocksrin.common.utils.AppConstant;
-import org.stocksrin.common.utils.CommonUtils;
 import org.stocksrin.common.utils.DateUtils;
 import org.stocksrin.common.utils.FileUtils;
 import org.stocksrin.common.utils.NSEHolidayUtils;
@@ -15,20 +14,16 @@ import org.stocksrin.email.SendEmail;
 
 public class ParticapentFnoDataDownloaderTask extends TimerTask {
 
-	// need to trst on holy day 0kb files being downloanded when marekt is not
+	// need to trst on holy day 0kb files being downloanded when market is not
 	// open
 	private static final Logger log = LoggerFactory.getLogger(ParticapentFnoDataDownloaderTask.class);
-
-	public static void main(String[] args) throws Exception {
-		ParticapentFnoDataDownloaderTask.download();
-	}
 
 	@Override
 	public void run() {
 		try {
-			if (!DateUtils.isWeekEndDay()  && !NSEHolidayUtils.isHoliday()) {
+			if (!DateUtils.isWeekEndDay() && !NSEHolidayUtils.isHoliday()) {
 				String file = download();
-				Util.collectAllDateForDay(file);
+				// Util.collectAllDateForDay(file);
 				log.info("ParticapentFnoDataDownloaded : " + file);
 				SendEmail.sentMail("FNO OI All Particapent Data SUCCESS", "SUCCESS file " + file, "Data-Downloader");
 			}
@@ -60,24 +55,27 @@ public class ParticapentFnoDataDownloaderTask extends TimerTask {
 
 		if (!FileUtils.isFileExits(file)) {
 			FileUtils.downloadFile(url, file);
-			if (matchFileDate(file)) {
-				return file;
-			}
+			return file;
+			/*
+			 * if (matchFileDate(file)) {
+			 * 
+			 * }
+			 */
 		} else {
 			log.info("Already downloaded " + file);
 		}
 		return file;
 	}
 
-	private static boolean matchFileDate(String file) throws Exception {
-		String[] line = CommonUtils.getCSVData_FirstLine(file);
-		String[] a = line[0].split("as on");
-		String dateMatch = DateUtils.dateToString(new Date(), "MMMM dd");
-		boolean status = dateMatch.equalsIgnoreCase(a[1].trim());
-		if (!status) {
-			FileUtils.delete(file);
-			throw new Exception("Market is closed or its holiday Today or File is not generated in NSE! file " + file + ", will be delted");
-		}
-		return status;
-	}
+	/*
+	 * private static boolean matchFileDate(String file) throws Exception { String[]
+	 * line = CommonUtils.getCSVData_FirstLine(file); String[] a =
+	 * line[0].split("as on"); String dateMatch = DateUtils.dateToString(new Date(),
+	 * "MMMM dd"); System.out.println("dateMatch " + dateMatch);
+	 * System.out.println("a[1].trim() " + a[1].trim()); boolean status =
+	 * dateMatch.equalsIgnoreCase(a[1].trim()); if (!status) {
+	 * FileUtils.delete(file); throw new
+	 * Exception("Market is closed or its holiday Today or File is not generated in NSE! file "
+	 * + file + ", will be delted"); } return status; }
+	 */
 }

@@ -6,23 +6,21 @@ import java.util.List;
 import java.util.Map;
 
 public class Strategy {
-	
+
 	private UnderLying underlying;
 	private double underlying_ltp;
 	private double tradeSpotPrice;
 	private String dataUpdatedAt;
 	private String tradeDate;
 	private String tradeDay;
-	
 
 	private double stopLoss;
 	private String strategyName;
 
 	private double totalPL;
 	private double target;
-	private	double targetLoss;
-	
-	
+	private double targetLoss;
+
 	private double totalPLMin;
 	private double totalPLMax;
 	private String totalPLMinTime;
@@ -32,6 +30,8 @@ public class Strategy {
 	private String dir;
 	private String fileName;
 
+	private String dte;
+
 	public Strategy() {
 	}
 
@@ -40,7 +40,7 @@ public class Strategy {
 	}
 
 	public static enum UnderLying {
-		BANKNIFTY, NIFTY, OTHERS;
+		BANKNIFTY, NIFTY, USDINR, OTHERS;
 
 		private UnderLying() {
 		}
@@ -261,6 +261,14 @@ public class Strategy {
 
 	public void setTargetLoss(double targetLoss) {
 		this.targetLoss = targetLoss;
+	}
+
+	public String getDte() {
+		return dte;
+	}
+
+	public void setDte(String dte) {
+		this.dte = dte;
 	}
 
 	public String toString() {

@@ -23,7 +23,7 @@ public class PriceUtils {
 
 	public static synchronized void fetchData() throws Exception {
 		loadBNLiveData();
-		Thread.sleep(2);
+		Thread.sleep(1);
 		loadNiftyData();
 		log.info("BNF : " + BankNiftyData.getBNFSpot());
 		log.info("Nifty : " + NiftyData.getNFSpot());

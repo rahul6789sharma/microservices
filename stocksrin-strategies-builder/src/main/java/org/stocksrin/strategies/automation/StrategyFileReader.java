@@ -46,8 +46,12 @@ public class StrategyFileReader {
 						// Result
 						InMemoryStrategyies.put(string, startgy, starttegyDir);
 
-					} else {
-						System.out.println("****** Underlying unknown ****");
+					} else if (startgy.getUnderlying().equals(UnderLying.USDINR)) {
+						InMemoryStrategyies.put(string, startgy, starttegyDir);
+					}
+
+					else {
+						System.out.println("****** Underlying unknown ****" + startgy.getUnderlying());
 					}
 				}
 			} finally {

@@ -96,11 +96,19 @@
 		<div class="col-xs-12 col-sm-2 col-md-2" style="padding: 0">
 
 			<ul class="list-group">
+				
+				<li class="list-group-item small" style="display: grid;">
+					Data Update At <span class="badge fa fa-inr"
+					style="background-color: #5bc0de; font-size: 15px;" id="updateTime">
+						&nbsp 0</span>
+				</li>
+				
 				<li class="list-group-item small" style="display: grid;">
 					BankNifty Spot <span class="badge fa fa-inr"
 					style="background-color: #5bc0de; font-size: 15px;" id="bnSpot">
 						&nbsp 0</span>
 				</li>
+				
 				<li class="list-group-item small" style="display: grid;">Max
 					Pain <span class="badge fa fa-inr"
 					style="background-color: #5bc0de; font-size: 15px;" id="maxPain">
@@ -174,6 +182,7 @@
 		var expiry;
 		var maxPainStrick;
 		var spot;
+		var lastUpdateTime;
 		for ( var key in jsonResponse) {
 			//console.log(key, jsonResponse[key]);
 			//console.log( key, jsonResponse[key].optionModle );
@@ -183,7 +192,7 @@
 			calltotalOI = jsonResponse[key].total_ce_oi;
 			puttotalOI = jsonResponse[key].total_pe_oi;
 			spot = jsonResponse[key].spot;
-
+			lastUpdateTime= jsonResponse[key].lastDataUpdated;
 			for ( var key2 in optionModle) {
 
 				if (optionModle[key2].strike_price < spot) {
@@ -225,14 +234,14 @@
 		 console.log(putChangeINoI) */
 
 		drawcallPUTTotalOI(strikePrice, callOI, putOI, expiry)
-		drawcallPUTTotalChangeOI(strikePrice, callChangeINoI, putChangeINoI,
-				expiry)
+		drawcallPUTTotalChangeOI(strikePrice, callChangeINoI, putChangeINoI,expiry)
 
 		drawCallsPuts(getLacks(calltotalOI), getLacks(puttotalOI));
 
+		document.getElementById('updateTime').innerHTML = " &nbsp " + lastUpdateTime;
 		document.getElementById('bnSpot').innerHTML = " &nbsp " + spot;
-		document.getElementById('maxPain').innerHTML = " &nbsp "
-				+ maxPainStrick;
+		document.getElementById('maxPain').innerHTML = " &nbsp "+ maxPainStrick;
+		
 		var pcr = parseFloat(puttotalOI / calltotalOI).toFixed(2)
 		document.getElementById('pcr').innerHTML = " &nbsp " + pcr;
 	}

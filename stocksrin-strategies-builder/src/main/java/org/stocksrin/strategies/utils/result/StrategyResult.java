@@ -5,26 +5,36 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.stocksrin.collector.option.data.InMemoryStrategyies;
 import org.stocksrin.common.model.strategies.Strategy;
-import org.stocksrin.common.model.strategies.StrategyModel;
 import org.stocksrin.common.utils.DateUtils;
 import org.stocksrin.common.utils.FileUtils;
 
 public class StrategyResult {
 
-	public static Map<String, List<StrategyModel>> strategies = new ConcurrentHashMap<>();
-	public static Map<String, String> map = new ConcurrentHashMap<>();
+	private static final Logger log = LoggerFactory.getLogger(StrategyResult.class);
 
 	public static void main(String[] args) throws Exception {
 		// String dir = APPConstant.STOCKSRIN__STRATEGY_AUTO_DIR;
 		// System.out.println(dir);
 		// writeStrategyFile("demo", dir);
+	}
+
+	public static synchronized void writeResultUSDINR() {
+		Set<String> keys = InMemoryStrategyies.getStrategiesUSDINR().keySet();
+		for (String string : keys) {
+			Strategy lst = InMemoryStrategyies.getStrategiesUSDINR().get(string);
+			try {
+				StrategyResult.writeStrategyFileUSDINR(lst);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 	public static synchronized void writeResult() {
@@ -51,6 +61,31 @@ public class StrategyResult {
 
 	}
 
+	public static void writeStrategyFileUSDINR(Strategy strategy) throws Exception {
+		String date = DateUtils.dateToString(new Date(), "MMMyyyy");
+		// String dir = APPConstant.STOCKSRIN__STRATEGY_DIR_RESULT + date +
+		// File.separator;
+		String dir1 = strategy.getDir();
+		String dir = dir1.substring(0, dir1.length() - 1);// removing last //
+
+		String name = strategy.getFileName().split(".csv")[0];
+		String resultDir = dir + "_Result" + File.separator + date + File.separator;
+		String file = resultDir + name + ".txt";
+
+		FileUtils.makeDir(resultDir);
+		FileUtils.makeFile(file);
+
+		StringBuilder result = StrategyPrinterConsoleUSDINR.print(strategy);
+
+		if (result != null) {
+			appendData("\n********************************************************************************************\n", file);
+			appendData(result.toString(), file);
+		}
+		log.info("------------");
+		log.info(result.toString());
+		log.info("------------");
+	}
+
 	public static void writeStrategyFile(Strategy strategy) throws Exception {
 		String date = DateUtils.dateToString(new Date(), "MMMyyyy");
 		// String dir = APPConstant.STOCKSRIN__STRATEGY_DIR_RESULT + date +
@@ -71,30 +106,10 @@ public class StrategyResult {
 			appendData("\n********************************************************************************************\n", file);
 			appendData(result.toString(), file);
 		}
-
+		log.info("------------");
+		log.info(result.toString());
+		log.info("------------");
 	}
-
-	/*
-	 * public static void writeStrategyFile3(Strategy strategy) throws Exception
-	 * { String date = DateUtils.dateToString(new Date(), "MMMyyyy");
-	 * 
-	 * String dir1 = strategy.getDir(); String dir = dir1.substring(0,
-	 * dir1.length() - 1);// removing last //
-	 * 
-	 * String name = strategy.getFileName().split(".csv")[0]; String resultDir =
-	 * dir + "_Result" + File.separator + date + File.separator; String file =
-	 * resultDir + name + ".txt";
-	 * 
-	 * FileUtils.makeDir(resultDir); FileUtils.makeFile(file);
-	 * 
-	 * StringBuilder result = StrategyPrinterConsole.print(strategy);
-	 * 
-	 * if (result != null) { appendData(
-	 * "\n********************************************************************************************\n",
-	 * file); appendData(result.toString(), file); }
-	 * 
-	 * }
-	 */
 
 	private static void appendData(String data, String fileName) {
 

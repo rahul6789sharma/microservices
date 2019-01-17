@@ -28,6 +28,7 @@ public class InMemeoryStrategyDataUpdater extends TimerTask {
 	private static final Logger log = LoggerFactory.getLogger(InMemeoryStrategyDataUpdater.class);
 	static long timeInteval = 120000;
 
+	// static long timeInteval = 12000;
 	@Autowired(required = true)
 	private BNFConsumeWebService bnfConsumeWebService;
 
@@ -50,7 +51,7 @@ public class InMemeoryStrategyDataUpdater extends TimerTask {
 						for (String string2 : keys) {
 							Strategy strategy = InMemoryStrategyies.getStrategies().get(string2);
 							updatePrice(strategy);
-							//StringBuilder result =StrategyPrinterConsole.print(strategy);
+							// StringBuilder result = StrategyPrinterConsole.print(strategy);
 							PNLMail.targetMail(strategy);
 						}
 
@@ -59,7 +60,7 @@ public class InMemeoryStrategyDataUpdater extends TimerTask {
 						for (String string2 : keys2) {
 							Strategy strategy = InMemoryStrategyies.getStrategiesIntraDay().get(string2);
 							updatePrice(strategy);
-							//StrategyPrinterConsole.print(strategy);
+							// StringBuilder result = StrategyPrinterConsole.print(strategy);
 							PNLMail.targetMail(strategy);
 						}
 					} finally {
@@ -85,27 +86,23 @@ public class InMemeoryStrategyDataUpdater extends TimerTask {
 		if (strategy.getUnderlying().equals(UnderLying.BANKNIFTY)) {
 			List<StrategyModel> strategyModels = strategy.getStrategyModels();
 			strategy.setUnderlying_ltp(bnfConsumeWebService.getSpotPrice());
-			// strategy.setUnderlying_ltp(BankNiftyData.getBNFSpot());
+
 			double totalPL = 0;
-			double ltp = 0;
+			Double ltp = null;
 			Double iv = null;
 			String lastDataUpdateTime = "";
 
 			for (StrategyModel strategyModel : strategyModels) {
 				ltp = bnfConsumeWebService.getOptionLtp(strategyModel.getExpiry(), strategyModel.getStrike(), strategyModel.getType());
 
-				// ltp = BankNiftyData.getLtp(strategyModel.getStrike(),
-				// strategyModel.getType(), strategyModel.getExpiry());
-
 				iv = bnfConsumeWebService.getIV(strategyModel.getExpiry(), strategyModel.getStrike(), strategyModel.getType());
-				// iv = BankNiftyData.getIV(strategyModel.getStrike(),
-				// strategyModel.getType(), strategyModel.getExpiry());
 
 				lastDataUpdateTime = bnfConsumeWebService.getLastDataUpdated(strategyModel.getExpiry());
-				// lastDataUpdateTime =
-				// BankNiftyData.getlastDataUpdated(strategyModel.getExpiry());
 
-				strategyModel.setLtp(ltp);
+				if (ltp != null && ltp != 0.0  && ltp != 0) {
+					strategyModel.setLtp(ltp);
+				}
+
 				if (iv != null) {
 					strategyModel.setCurrent_IV(iv);
 				}
@@ -117,35 +114,28 @@ public class InMemeoryStrategyDataUpdater extends TimerTask {
 		} else if (strategy.getUnderlying().equals(UnderLying.NIFTY)) {
 			List<StrategyModel> strategyModels = strategy.getStrategyModels();
 
-			// strategy.setUnderlying_ltp(NiftyData.getNFSpot());
 			strategy.setUnderlying_ltp(niftyConsumeWebService.getSpotPrice());
 
 			double totalPL = 0;
 			Double iv = null;
-			double ltp = 0;
+			Double ltp = null;
 			String lastDataUpdateTime = "";
 
 			for (StrategyModel strategyModel : strategyModels) {
-				// TODO
-				// ltp = NiftyData.getLtp(strategyModel.getStrike(),
-				// strategyModel.getType(), strategyModel.getExpiry());
 
 				ltp = niftyConsumeWebService.getOptionLtp(strategyModel.getExpiry(), strategyModel.getStrike(), strategyModel.getType());
 
-				// iv = NiftyData.getIV(strategyModel.getStrike(),
-				// strategyModel.getType(), strategyModel.getExpiry());
-
 				iv = niftyConsumeWebService.getIV(strategyModel.getExpiry(), strategyModel.getStrike(), strategyModel.getType());
 
-				strategyModel.setLtp(ltp);
+				if (ltp != null && ltp != 0.0  && ltp != 0) {
+					strategyModel.setLtp(ltp);
+				}
+
 				if (iv != null) {
 					strategyModel.setCurrent_IV(iv);
 				}
 
 				totalPL = totalPL + (strategyModel.getQuantity() * (strategyModel.getLtp() - strategyModel.getAvgPrice()));
-				// TODO
-				// lastDataUpdateTime =
-				// NiftyData.getlastDataUpdated(strategyModel.getExpiry());
 				lastDataUpdateTime = niftyConsumeWebService.getLastDataUpdated(strategyModel.getExpiry());
 			}
 			updateData(strategy, lastDataUpdateTime, totalPL);

@@ -71,24 +71,25 @@ public class BankNiftyData {
 	public static double getLtp(double strike, OptionType optionType, String expiry) {
 		OptionModles data = bnOptionData.get(expiry);
 		double ltp = 0.0;
-		if (data == null) {
-			return ltp;
-		}
+		if (data != null) {
 
-		if (optionType.equals(OptionType.PUT)) {
-			for (OptionModle optionModle : data.getOptionModle()) {
-				if (optionModle.getStrike_price().equals(strike)) {
-					ltp = optionModle.getP_ltp();
+			if (optionType.equals(OptionType.PUT)) {
+				for (OptionModle optionModle : data.getOptionModle()) {
+					if (optionModle.getStrike_price().equals(strike)) {
+						ltp = optionModle.getP_ltp();
+					}
+				}
+			} else if (optionType.equals(OptionType.CALL)) {
+
+				for (OptionModle optionModle : data.getOptionModle()) {
+					if (optionModle.getStrike_price().equals(strike)) {
+						ltp = optionModle.getC_ltp();
+					}
 				}
 			}
-		} else if (optionType.equals(OptionType.CALL)) {
 
-			for (OptionModle optionModle : data.getOptionModle()) {
-				if (optionModle.getStrike_price().equals(strike)) {
-					ltp = optionModle.getC_ltp();
-				}
-			}
 		}
+
 		return ltp;
 	}
 }

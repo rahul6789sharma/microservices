@@ -11,32 +11,34 @@ import org.stocksrin.strategies.utils.result.StrategyPrinterConsole;
 
 public class PNLMail {
 	private static final Logger log = LoggerFactory.getLogger(PNLMail.class);
-	/*
-	 * private double targetProfit = 1000; private double targetLoss = -1000;
-	 */
 
 	public static void targetMail(Strategy strategy) throws Exception {
 
 		String underlying;
 		if (UnderLying.NIFTY.equals(strategy.getUnderlying())) {
 			underlying = "NF";
-		} else {
+		} else if (UnderLying.BANKNIFTY.equals(strategy.getUnderlying())) {
 			underlying = "BNF";
+		} else if (UnderLying.USDINR.equals(strategy.getUnderlying())) {
+			underlying = "USDINR";
+		} else {
+			underlying = "OTHER";
 		}
 
 		// double targetloss = 0.0;
 		if (strategy.getTotalPL() > strategy.getTarget()) {
-			strategy.setTarget(strategy.getTotalPL() + 500);
-			log.info("target Achived " + strategy.getTotalPL());
-			log.info("Next target Achived " + strategy.getTarget());
+			strategy.setTarget(strategy.getTotalPL() + 800);
+			// log.info("target Achived " + strategy.getTotalPL());
+			// log.info("Next target Achived " + strategy.getTarget());
 			StringBuilder result = StrategyPrinterConsole.print(strategy);
+			log.info("*************************");
 			log.info(result.toString());
 			SendEmail.sentMail("P[" + foramtePL(strategy.getTotalPL()) + "] " + underlying + "-" + strategy.getStrategyName(), StrategyPrinterConsole.print(strategy).toString(), "strategy Builder");
 		} else if (strategy.getTotalPL() < strategy.getTargetLoss()) {
 
 			SendEmail.sentMail("L[" + foramtePL(strategy.getTotalPL()) + "] " + underlying + "-" + strategy.getStrategyName(), StrategyPrinterConsole.print(strategy).toString(), "strategy Builder");
 
-			strategy.setTargetLoss(strategy.getTotalPL() - 500);
+			strategy.setTargetLoss(strategy.getTotalPL() - 800);
 			log.info("stop Achived " + strategy.getTotalPL());
 			log.info("Next stop Achived " + strategy.getTargetLoss());
 		}

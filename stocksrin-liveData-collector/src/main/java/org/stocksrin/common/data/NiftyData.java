@@ -30,17 +30,30 @@ public class NiftyData {
 
 	public static String getlastDataUpdated(String expiry) {
 		OptionModles data = optionData.get(expiry);
-		return data.getLastDataUpdated();
+
+		if (data != null) {
+			return data.getLastDataUpdated();
+		} else {
+			return null;
+		}
+
 	}
 
 	public static double getNFSpot() {
-		OptionModles data = optionData.get(shortedExpiry.first());
-		return data.getSpot();
+		if (!shortedExpiry.isEmpty()) {
+			OptionModles data = optionData.get(shortedExpiry.first());
+			return data.getSpot();
+		}
+		return 0;
+
 	}
 
 	public static Double getIV(double strike, OptionType optionType, String expiry) {
 		OptionModles data = optionData.get(expiry);
 		Double iv = null;
+		if (data == null) {
+			return iv;
+		}
 		if (optionType.equals(OptionType.PUT)) {
 			for (OptionModle optionModle : data.getOptionModle()) {
 				if (optionModle.getStrike_price().equals(strike)) {
@@ -65,20 +78,24 @@ public class NiftyData {
 	public static double getLtp(double strike, OptionType optionType, String expiry) {
 		OptionModles data = optionData.get(expiry);
 		double ltp = 0.0;
-		if (optionType.equals(OptionType.PUT)) {
-			for (OptionModle optionModle : data.getOptionModle()) {
-				if (optionModle.getStrike_price().equals(strike)) {
-					ltp = optionModle.getP_ltp();
-				}
-			}
-		} else if (optionType.equals(OptionType.CALL)) {
+		if (data != null) {
 
-			for (OptionModle optionModle : data.getOptionModle()) {
-				if (optionModle.getStrike_price().equals(strike)) {
-					ltp = optionModle.getC_ltp();
+			if (optionType.equals(OptionType.PUT)) {
+				for (OptionModle optionModle : data.getOptionModle()) {
+					if (optionModle.getStrike_price().equals(strike)) {
+						ltp = optionModle.getP_ltp();
+					}
+				}
+			} else if (optionType.equals(OptionType.CALL)) {
+
+				for (OptionModle optionModle : data.getOptionModle()) {
+					if (optionModle.getStrike_price().equals(strike)) {
+						ltp = optionModle.getC_ltp();
+					}
 				}
 			}
 		}
 		return ltp;
+
 	}
 }

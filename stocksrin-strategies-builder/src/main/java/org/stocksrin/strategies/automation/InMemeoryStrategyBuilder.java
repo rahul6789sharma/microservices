@@ -17,10 +17,8 @@ public class InMemeoryStrategyBuilder extends TimerTask {
 	@Override
 	public void run() {
 
-		InMemoryStrategyies.clear();
-
 		if (!DateUtils.isWeekEndDay() && !NSEHolidayUtils.isHoliday()) {
-
+			InMemoryStrategyies.clear();
 			while (CommonUtils.getEveningTimeForStrategy()) {
 				try {
 
@@ -30,9 +28,24 @@ public class InMemeoryStrategyBuilder extends TimerTask {
 
 					// daily
 					StrategyFileReader.startManualStrategies(AppConstant.STOCKSRIN_STRATEGY_DIR_DAILY_BNF_Strategy);
+					StrategyFileReader.startManualStrategies(AppConstant.STOCKSRIN_STRATEGY_DIR_DAILY_NIFTY_Strategy_AutoMated);
 					StrategyFileReader.startManualStrategies(AppConstant.STOCKSRIN_STRATEGY_DIR_DAILY_BNF_Strategy_AutoMated);
 					StrategyFileReader.startManualStrategies(AppConstant.STOCKSRIN_STRATEGY_DIR_DAILY_NIFTY_Strategy);
-					StrategyFileReader.startManualStrategies(AppConstant.STOCKSRIN_STRATEGY_DIR_DAILY_NIFTY_Strategy_AutoMated);
+
+					StrategyFileReader.startManualStrategies(AppConstant.STOCKSRIN_STRATEGY_DIR_DAILY_USDINR_Strategy_AutoMated);
+
+					Thread.sleep(timeInteval);
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+
+			// after nifty usd inr only
+			while (CommonUtils.getEveningTimeUSDINR()) {
+				try {
+
+					StrategyFileReader.startManualStrategies(AppConstant.STOCKSRIN_STRATEGY_DIR_DAILY_USDINR_Strategy_AutoMated);
 
 					Thread.sleep(timeInteval);
 

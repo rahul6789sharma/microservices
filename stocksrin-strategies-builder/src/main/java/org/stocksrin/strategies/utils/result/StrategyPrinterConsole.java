@@ -4,15 +4,16 @@ import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.stocksrin.common.model.option.OptionType;
 import org.stocksrin.common.model.strategies.Strategy;
 import org.stocksrin.common.model.strategies.StrategyModel;
 import org.stocksrin.common.utils.DateUtils;
 
 public class StrategyPrinterConsole {
-	private static final Logger log = LoggerFactory.getLogger(StrategyPrinterConsole.class);
+	
+
+
+	//private static final Logger log = LoggerFactory.getLogger(StrategyPrinterConsole.class);
 	private static DecimalFormat df = new DecimalFormat("#00.00");
 	private static DecimalFormat signFormate = new DecimalFormat("+#,##00;-#");
 	private static String line = "---------------------------------------------------------------------------------------------------------------------------";
@@ -32,7 +33,7 @@ public class StrategyPrinterConsole {
 		result.append("\n");
 		result.append(line);
 		result.append("\n");
-		result.append("Trade Date: " + strategy.getTradeDate() + " (" + tradedDay + "), Traded Price:  " + strategy.getTradeSpotPrice() + "\n");
+		result.append("Trade Date: " + strategy.getTradeDate() + " (" + tradedDay + "), Traded Price:  " + strategy.getTradeSpotPrice() + ", DTE: " + strategy.getDte() + "\n");
 		result.append("Status  At: " + todayDate + " (" + todayDay + "), Current Price: " + strategy.getUnderlying_ltp() + " [" + diff + "] Diff from Trade");
 		result.append("\n");
 		result.append(line);
@@ -87,7 +88,7 @@ public class StrategyPrinterConsole {
 		result.append("MaxProfit : " + "[" + strategy.getMaxProfit() + "]");
 		result.append("\n");
 		result.append(line + "\n");
-		
+
 		return result;
 
 	}
@@ -116,19 +117,6 @@ public class StrategyPrinterConsole {
 
 	public static void main(String[] args) throws Exception {
 
-		/*
-		 * System.out.println("Straing "); Map<String, Strategy> strategyMap =
-		 * CommonUtils.getStrategy2(AppConstant.
-		 * STOCKSRIN__STRATEGY_AUTO_DIR_INTRADAY_TradeStrategy); //
-		 * System.out.println(strategyMap); Set<String> keys = strategyMap.keySet(); for
-		 * (String string : keys) { Strategy strategy = strategyMap.get(string); //
-		 * System.out.println(strategy.getUnderlying()); StrategyWrite.print(strategy);
-		 * if (CommonUtils.isTimeLessThen(15, 38)) {
-		 * StrategyResult.writeStrategyFile2(strategy); }
-		 * 
-		 * System.out.println(strategyMap.get(string)); }
-		 * System.out.println(CommonUtils.isTimeLessThen(15, 38));
-		 */
 	}
 
 }

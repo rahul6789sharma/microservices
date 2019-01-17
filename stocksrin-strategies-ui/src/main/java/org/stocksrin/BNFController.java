@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +20,7 @@ import org.stocksrin.common.utils.ComparatorBasedOnDate;
 @RestController
 @RequestMapping("/bnf")
 public class BNFController {
+	private static final Logger log = LoggerFactory.getLogger(BNFController.class);
 
 	@Value("${microservice.liveData.url}")
 	private String uri;
@@ -34,12 +37,10 @@ public class BNFController {
 		Set<String> expiry = restTemplate.getForObject(url, SortedSet.class);
 		SortedSet<String> expirySet = new TreeSet<>(new ComparatorBasedOnDate());
 		expirySet.addAll(expiry);
-		
-		String currentExpiry = expirySet.first();
-		
 
+		String currentExpiry = expirySet.first();
 		String url2 = uri + "/bnf/optionModel/" + currentExpiry;
-		
+		// System.out.println("url2 "+url2);
 		OptionModles data = restTemplate.getForObject(url2, OptionModles.class);
 		Map<String, OptionModles> result = new HashMap<>();
 		result.put(currentExpiry, data);
@@ -47,17 +48,29 @@ public class BNFController {
 	}
 
 	@GetMapping("/strategies")
-	public Map<String, Strategy> getStrategyResult() throws Exception {
+	public Map<String, Strategy> getStrategyResult() {
+		Map<String, Strategy> result = new HashMap<>();
 		String url = uri_strategies + "strategies";
-		Map<String, Strategy> result = restTemplate.getForObject(url, Map.class);
+		try {
+			result = restTemplate.getForObject(url, Map.class);
+		} catch (Exception e) {
+			log.error("Error, URL  " + url + " : " + e.getMessage());
+			e.printStackTrace();
+		}
 		return result;
 	}
-	
 
 	@GetMapping("/strategiesIntraDay")
-	public Map<String, Strategy> getIntraDayStrategyResult() throws Exception {
+	public Map<String, Strategy> getIntraDayStrategyResult() {
+		Map<String, Strategy> result = new HashMap<>();
 		String url = uri_strategies + "strategiesIntraDay";
-		Map<String, Strategy> result = restTemplate.getForObject(url, Map.class);
+		try {
+			result = restTemplate.getForObject(url, Map.class);
+		} catch (Exception e) {
+			log.error("Error, URL  " + url + " : " + e.getMessage());
+			e.printStackTrace();
+		}
 		return result;
+
 	}
 }

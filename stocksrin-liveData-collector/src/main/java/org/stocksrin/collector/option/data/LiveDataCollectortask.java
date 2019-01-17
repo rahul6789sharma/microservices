@@ -11,13 +11,10 @@ import org.stocksrin.common.utils.NSEHolidayUtils;
 import org.stocksrin.email.SendEmail;
 
 public class LiveDataCollectortask extends TimerTask {
+	
 	private long timeInteval = 120000;
 	private static final Logger log = LoggerFactory.getLogger(LiveDataCollectortask.class);
 
-	public static void main(String[] args) {
-		LiveDataCollectortask LiveDataCollectortask = new LiveDataCollectortask();
-		LiveDataCollectortask.run();
-	}
 
 	@Override
 	public void run() {

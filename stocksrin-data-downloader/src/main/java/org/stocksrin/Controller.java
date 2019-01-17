@@ -13,13 +13,8 @@ public class Controller {
 	@Value("${logging.file}")
 	private String name;
 
-	
-	
-	
-
 	@RequestMapping("/hello2")
 	public String sayHello() {
-
 
 		return "hello";
 	}

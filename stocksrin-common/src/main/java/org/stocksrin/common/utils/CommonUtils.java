@@ -37,7 +37,8 @@ public class CommonUtils {
 			string.append(line + "\n");
 			Integer totalp = (int) Math.round(totalPremium); // 3
 			string.append("Total Premium : " + totalp);
-			// SendEmail.sentMail("Premium : [" + totalp + "] ," + fileName,string.toString(), "strategy Builder");
+			// SendEmail.sentMail("Premium : [" + totalp + "] ," +
+			// fileName,string.toString(), "strategy Builder");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -203,6 +204,20 @@ public class CommonUtils {
 		return fIIDIIDataModle;
 	}
 
+	public static boolean getEveningTimeUSDINR() {
+		Calendar today = Calendar.getInstance(TimeZone.getTimeZone("IST"));
+		today.set(11, 17);
+		today.set(12, 10);
+		today.set(13, 0);
+
+		Calendar now = Calendar.getInstance(TimeZone.getTimeZone("IST"));
+		if (now.after(today)) {
+			System.out.println("USD Time is more then 5:00 pm");
+			return false;
+		}
+		return true;
+	}
+
 	public static boolean getEveningTime() {
 		Calendar today = Calendar.getInstance(TimeZone.getTimeZone("IST"));
 		today.set(11, 15);
@@ -229,7 +244,7 @@ public class CommonUtils {
 		}
 		return true;
 	}
-	
+
 	public static String getFilesName(List<String> files) {
 		StringBuilder string = new StringBuilder();
 		for (String f : files) {

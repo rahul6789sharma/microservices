@@ -7,12 +7,38 @@ import java.util.List;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.stocksrin.common.model.option.FuturePrice;
 import org.stocksrin.common.model.option.OptionModle;
 import org.stocksrin.common.model.option.OptionModles;
 import org.stocksrin.common.utils.DateUtils;
 
 public class CommonHTMLDocParsher {
-	
+
+	public static FuturePrice getFuturePrice(Document doc) {
+		try {
+			Elements strong = doc.select("div[id=responseDiv]");
+			String dataJson = strong.get(0).text();
+			FuturePrice futurePrice = getUSDINRFuturefromJsonString(dataJson);
+			return futurePrice;
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static FuturePrice getUSDINRFuturefromJsonString(String jsonData) {
+		FuturePrice futurePrice = new FuturePrice();
+		// System.out.println("jsonData " + jsonData);
+
+		String a = jsonData.split("buyPrice1\":\"")[1].split("\",")[0];
+		//System.out.println(a);
+		futurePrice.setLastPrice(Double.parseDouble(a));
+		//System.out.println("UsdInrFuture " + futurePrice);
+
+		return futurePrice;
+	}
+
 	public static OptionModles parseNSEColumn(Document doc, Elements rows) {
 		List<OptionModle> lst = parseOptionTableColumn(doc, rows);
 		OptionModles result = updateTotalOI(doc, lst);
@@ -21,6 +47,22 @@ public class CommonHTMLDocParsher {
 			String spotString = getSpotPrice(elements);
 			result.setUnderlyingSpotPriceString(spotString);
 			result.setSpot(parseSpot(spotString));
+			result.setDate(getDate(spotString));
+			result.setLastDataUpdated(getLastUpdate(spotString));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public static OptionModles parseUSDINRColumn(Document doc, Elements rows) throws Exception {
+		List<OptionModle> lst = parseUSDINROptionTableColumn(doc, rows);
+		OptionModles result = updateTotalOI(doc, lst);
+		try {
+			Elements elements = getTable(doc, 0);
+			String spotString = getSpotPrice(elements).trim();
+			result.setUnderlyingSpotPriceString(spotString);
+			// result.setSpot(parseSpot(spotString));
 			result.setDate(getDate(spotString));
 			result.setLastDataUpdated(getLastUpdate(spotString));
 		} catch (Exception e) {
@@ -39,10 +81,10 @@ public class CommonHTMLDocParsher {
 	}
 
 	public static List<String> getSelectBoxById(Document doc, String id, int index) throws Exception {
-		List<String> lst = new ArrayList();
+		List<String> lst = new ArrayList<>();
 		try {
 			Elements dropbox = ((Element) doc.select("select[id=" + id + "]").get(index)).children();
-			lst = new ArrayList();
+			lst = new ArrayList<>();
 			for (int i = 1; i < dropbox.size(); i++) {
 				lst.add(((Element) dropbox.get(i)).text());
 			}
@@ -55,28 +97,16 @@ public class CommonHTMLDocParsher {
 		return lst;
 	}
 
-	public static OptionModles parseUSDINRColumn(Document doc, Elements rows) {
-		List<OptionModle> lst = new ArrayList();
-		try {
-			lst = parseUSDINROptionTableColumn(doc, rows);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		OptionModles result = updateTotalOI(doc, lst);
-		return result;
-	}
-
 	private static List<OptionModle> parseUSDINROptionTableColumn(Document doc, Elements rows) throws Exception {
-		List<OptionModle> lst = new ArrayList();
+		List<OptionModle> lst = new ArrayList<>();
 		for (int i = 2; i < rows.size() - 1; i++) {
 			Element row = (Element) rows.get(i);
 			Elements cols = row.select("td");
-
 			OptionModle column = new OptionModle();
 			for (int j = 0; j < cols.size(); j++) {
 				Element col = (Element) cols.get(j);
 				if (cols.size() == 21) {
-					column.setValue(j, col.text());
+					column.setValueUSDINR(j, col.text());
 				}
 			}
 			lst.add(column);
@@ -97,7 +127,7 @@ public class CommonHTMLDocParsher {
 	}
 
 	private static List<OptionModle> parseOptionTableColumn(Document doc, Elements rows) {
-		List<OptionModle> lst = new ArrayList();
+		List<OptionModle> lst = new ArrayList<>();
 		for (int i = 2; i < rows.size() - 1; i++) {
 			Element row = (Element) rows.get(i);
 			Elements cols = row.select("td");
@@ -115,21 +145,40 @@ public class CommonHTMLDocParsher {
 	}
 
 	private static OptionModles updateTotalOI(Document doc, List<OptionModle> column) {
+
 		OptionModles columns = new OptionModles();
 		columns.setOptionModle(column);
 
 		int total_ce_oi = 0;
 		int total_pe_oi = 0;
+
+		int total_ce_oi_change = 0;
+		int total_pe_oi_change = 0;
+
 		for (OptionModle c : column) {
+
 			if (c.getC_oi() != null) {
 				total_ce_oi += c.getC_oi().intValue();
 			}
+
 			if (c.getP_oi() != null) {
 				total_pe_oi += c.getP_oi().intValue();
 			}
+
+			if (c.getC_change_oi() != null) {
+				total_ce_oi_change += c.getC_change_oi().intValue();
+			}
+
+			if (c.getP_change_oi() != null) {
+				total_pe_oi_change += c.getP_change_oi().intValue();
+			}
+
 		}
 		columns.setTotal_ce_oi(total_ce_oi);
 		columns.setTotal_pe_oi(total_pe_oi);
+
+		columns.setTotal_ce_oi_change(total_ce_oi_change);
+		columns.setTotal_pe_oi_change(total_pe_oi_change);
 
 		return columns;
 	}

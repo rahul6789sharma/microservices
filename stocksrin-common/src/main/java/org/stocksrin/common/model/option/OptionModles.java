@@ -16,14 +16,23 @@ public class OptionModles implements Serializable {
 	private String lastDataUpdated;
 	private String underlyingSpotPriceString;
 	private Double spot;
+
 	private Double previousClose;
 	private String change;
 	private String type;
+
 	private int total_ce_oi;
 	private int total_pe_oi;
+
+	private int total_ce_oi_change;
+	private int total_pe_oi_change;
+
 	private double maxPainStrick;
 	private List<OptionModle> optionModle = new ArrayList<>();
 
+	// used in usdInr
+	private FuturePrice futurePrice;
+	
 	public int getTotal_ce_oi() {
 		return this.total_ce_oi;
 	}
@@ -126,6 +135,30 @@ public class OptionModles implements Serializable {
 
 	public void setMaxPainStrick(double maxPainStrick) {
 		this.maxPainStrick = maxPainStrick;
+	}
+
+	public int getTotal_ce_oi_change() {
+		return total_ce_oi_change;
+	}
+
+	public void setTotal_ce_oi_change(int total_ce_oi_change) {
+		this.total_ce_oi_change = total_ce_oi_change;
+	}
+
+	public int getTotal_pe_oi_change() {
+		return total_pe_oi_change;
+	}
+
+	public void setTotal_pe_oi_change(int total_pe_oi_change) {
+		this.total_pe_oi_change = total_pe_oi_change;
+	}
+
+	public FuturePrice getFuturePrice() {
+		return futurePrice;
+	}
+
+	public void setFuturePrice(FuturePrice futurePrice) {
+		this.futurePrice = futurePrice;
 	}
 
 	public String toString() {

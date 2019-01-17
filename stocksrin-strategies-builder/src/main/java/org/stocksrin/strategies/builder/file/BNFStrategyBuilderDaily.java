@@ -53,7 +53,7 @@ public class BNFStrategyBuilderDaily extends TimerTask {
 			}
 
 			try {
-				files.add(bnfStrangle.itmStrangle3("ITM3Strangle@AUTO-Strategy_BANKNIFTY", AppConstant.STOCKSRIN_STRATEGY_DIR_DAILY_BNF_Strategy_AutoMated));
+				//files.add(bnfStrangle.itmStrangle3("ITM3Strangle@AUTO-Strategy_BANKNIFTY", AppConstant.STOCKSRIN_STRATEGY_DIR_DAILY_BNF_Strategy_AutoMated));
 			} catch (Exception e) {
 				SendEmail.sentMail("Auto Build Strategy Failed", e.getMessage(), "Strategies-BUilder");
 			}
@@ -65,13 +65,19 @@ public class BNFStrategyBuilderDaily extends TimerTask {
 			}
 
 			try {
-				files.add(niftyStrategies.Strategy3StrangleOTM("OTM3Strangle@AUTO-Strategy_NIFTY", AppConstant.STOCKSRIN_STRATEGY_DIR_DAILY_NIFTY_Strategy_AutoMated));
+			//	files.add(niftyStrategies.Strategy3StrangleOTM("OTM3Strangle@AUTO-Strategy_NIFTY", AppConstant.STOCKSRIN_STRATEGY_DIR_DAILY_NIFTY_Strategy_AutoMated));
 			} catch (Exception e) {
 				SendEmail.sentMail("Auto Build Strategy Failed", e.getMessage(), "Strategies-BUilder");
 			}
 
 			try {
-				files.add(niftyStrategies.Strategy3StrangleITM("ITM3Strangle@AUTO-Strategy_NIFTY", AppConstant.STOCKSRIN_STRATEGY_DIR_DAILY_NIFTY_Strategy_AutoMated));
+				//files.add(niftyStrategies.strangleOTM200PointFar("OTMStrangle200PointFar@AUTO-Strategy_NIFTY", AppConstant.STOCKSRIN_STRATEGY_DIR_DAILY_NIFTY_Strategy_AutoMated));
+			} catch (Exception e) {
+				SendEmail.sentMail("Auto Build Strategy Failed", e.getMessage(), "Strategies-BUilder");
+			}
+
+			try {
+				//files.add(niftyStrategies.Strategy3StrangleITM("ITM3Strangle@AUTO-Strategy_NIFTY", AppConstant.STOCKSRIN_STRATEGY_DIR_DAILY_NIFTY_Strategy_AutoMated));
 			} catch (Exception e) {
 				SendEmail.sentMail("Auto Build Strategy Failed", e.getMessage(), "Strategies-BUilder");
 			}
@@ -81,8 +87,6 @@ public class BNFStrategyBuilderDaily extends TimerTask {
 			log.info("Building Strategy Automatic completed");
 		}
 	}
-
-
 
 	public static void main(String[] args) {
 		try {

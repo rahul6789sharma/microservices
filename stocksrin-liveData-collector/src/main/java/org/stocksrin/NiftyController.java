@@ -1,5 +1,6 @@
 package org.stocksrin;
 
+import java.util.Map;
 import java.util.SortedSet;
 
 import org.springframework.http.ResponseEntity;
@@ -7,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.stocksrin.ai.NIftyAIData;
+import org.stocksrin.ai.Straddle;
 import org.stocksrin.common.data.NiftyData;
 import org.stocksrin.common.model.option.OptionModles;
 import org.stocksrin.common.model.option.OptionType;
@@ -23,6 +26,12 @@ public class NiftyController {
 		return "Nifty HI";
 	}
 
+	@RequestMapping("/straddleData/{dte}")
+	public  Map<String, Straddle> straddleData(@PathVariable("dte") String dte) {
+		return NIftyAIData.getData(dte);
+	}
+
+	
 	@RequestMapping("/lastDataUpdated/{expiry}")
 	public ResponseEntity<String> getlastDataUpdated(@PathVariable("expiry") String expiry) {
 		return ResponseEntity.ok(NiftyData.getlastDataUpdated(expiry));

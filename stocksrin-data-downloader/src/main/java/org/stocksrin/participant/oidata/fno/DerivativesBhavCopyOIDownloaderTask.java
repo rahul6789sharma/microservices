@@ -41,18 +41,19 @@ public class DerivativesBhavCopyOIDownloaderTask extends TimerTask {
 				String completeFileName = completedir + fileName;
 				boolean status = false;
 				int retryCounter = 0;
-				url = "https://www.nseindia.com/content/historical/DERIVATIVES/2018/DEC/fo05DEC2018bhav.csv.zip";
+				// url =
+				// "https://www.nseindia.com/content/historical/DERIVATIVES/2018/DEC/fo05DEC2018bhav.csv.zip";
 				while (!status && retryCounter < RETRY) {
-					System.out.println("retrying.. " +retryCounter);
+					System.out.println("retrying.. " + retryCounter);
 					System.out.println("url.." + url);
 					System.out.println("completeFileName.." + completeFileName);
 					try {
 						status = FileUtils.downloadFile(url, completeFileName);
-						
+
 					} catch (Exception e) {
 						SendEmail.sentMail("CRITICAL! Retry Bhav Copy is not downloaded", "url " + url + "\n completeFileName" + completeFileName, "Data-Downloader");
 						e.printStackTrace();
-				// retry after 5 min
+						// retry after 5 min
 						Thread.sleep(500000);
 					}
 

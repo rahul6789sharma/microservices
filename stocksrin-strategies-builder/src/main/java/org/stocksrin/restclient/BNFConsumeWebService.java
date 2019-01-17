@@ -23,52 +23,79 @@ public class BNFConsumeWebService {
 
 	private RestTemplate restTemplate = new RestTemplate();
 
-	public SortedSet<String> getAllExpiry() {
-
-		String url = uri + "/bnf/shortedExpiry";
-
-		Set<String> data = restTemplate.getForObject(url, Set.class);
+	public SortedSet<String> getAllExpiry() throws Exception {
 		SortedSet<String> result = new TreeSet<>(new ComparatorBasedOnDate());
-		result.addAll(data);
+		String url = uri + "/bnf/shortedExpiry";
+		try {
+			Set<String> data = restTemplate.getForObject(url, Set.class);
+			result.addAll(data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception("Error url :" + uri);
+		}
 		return result;
 	}
 
-	public OptionModles getOptionModel(String expiry) {
-
+	public OptionModles getOptionModel(String expiry) throws Exception {
+		OptionModles data = null;
 		String url = uri + "/bnf/optionModel/" + expiry;
-
-		OptionModles data = restTemplate.getForObject(url, OptionModles.class);
+		try {
+			data = restTemplate.getForObject(url, OptionModles.class);
+		} catch (Exception e) {
+			//e.printStackTrace();
+			throw new Exception("Error url :" + uri);
+		}
 		return data;
 	}
 
-	public Double getSpotPrice() {
+	public Double getSpotPrice() throws Exception {
 		String url = uri + "/bnf/spotPrice";
-
-		Double data = restTemplate.getForObject(url, Double.class);
+		Double data = null;
+		try {
+			data = restTemplate.getForObject(url, Double.class);
+		} catch (Exception e) {
+			//e.printStackTrace();
+			throw new Exception("Error url :" + uri);
+		}
 		return data;
 	}
 
-	public Double getOptionLtp(String expiry, double strike, OptionType optionType) {
+	public Double getOptionLtp(String expiry, double strike, OptionType optionType) throws Exception {
 
 		String url = uri + "/bnf/optionLtp/" + expiry + "/" + strike + "/" + optionType;
-
-		Double data = restTemplate.getForObject(url, Double.class);
+		Double data = null;
+		try {
+			data = restTemplate.getForObject(url, Double.class);
+		} catch (Exception e) {
+			//e.printStackTrace();
+			throw new Exception("Error url :" + uri);
+		}
 		return data;
 	}
 
-	public Double getIV(String expiry, double strike, OptionType optionType) {
+	public Double getIV(String expiry, double strike, OptionType optionType) throws Exception {
 
 		String url = uri + "/bnf/iv/" + expiry + "/" + strike + "/" + optionType;
-
-		Double data = restTemplate.getForObject(url, Double.class);
+		Double data = null;
+		try {
+			data = restTemplate.getForObject(url, Double.class);
+		} catch (Exception e) {
+			//e.printStackTrace();
+			throw new Exception("Error url :" + uri);
+		}
 		return data;
 	}
 
-	public String getLastDataUpdated(String expiry) {
+	public String getLastDataUpdated(String expiry) throws Exception {
 
 		String url = uri + "/bnf/lastDataUpdated/" + expiry;
-		
-		String data = restTemplate.getForObject(url, String.class);
+		String data = null;
+		try {
+			data = restTemplate.getForObject(url, String.class);
+		} catch (Exception e) {
+			//e.printStackTrace();
+			throw new Exception("Error url :" + uri);
+		}
 		return data;
 	}
 }

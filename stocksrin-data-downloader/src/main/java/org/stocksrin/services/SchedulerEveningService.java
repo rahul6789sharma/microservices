@@ -14,6 +14,7 @@ import org.stocksrin.participant.oidata.fno.DerivativesBhavCopyOIDownloaderTask;
 @Service
 public class SchedulerEveningService {
 
+	
 	// Define the log object for this class
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -46,6 +47,7 @@ public class SchedulerEveningService {
 			e.printStackTrace();
 		}
 
+		
 		log.info("######### SchedulerEveningService Started ############");
 	}
 }

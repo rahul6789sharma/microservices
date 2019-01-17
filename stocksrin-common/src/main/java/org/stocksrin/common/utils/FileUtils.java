@@ -19,6 +19,10 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class FileUtils {
 
 	public static void main(String[] args) {
@@ -27,6 +31,40 @@ public class FileUtils {
 		System.out.println(new Date());
 		long diff = yesterday().getTime() - today().getTime();
 		System.out.println("Days: " + TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS));
+	}
+
+	public static String lasFilePath(String dir) {
+		List<String> lst = FileUtils.listFilesForFolder(new File(dir));
+		String path = dir + lst.get(lst.size() - 1);
+		return path;
+	}
+
+	public static Object fromJson(String file) throws Exception {
+		ObjectMapper mapper = new ObjectMapper();
+
+		try {
+			Object data = mapper.readValue(new File(file), Object.class);
+			return data;
+
+		} catch (JsonGenerationException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+
+	public static void writeDataAsJson(Object data, String fileName) {
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			File file = new File(fileName);
+			mapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void bachup(String sourceFile, String targetFile) {
@@ -112,7 +150,7 @@ public class FileUtils {
 			status = true;
 
 		} catch (IOException e) {
-			throw new Exception("ERROR ! downloadBhavCopy, url "+url +" , Error Msg: " + e.getMessage());
+			throw new Exception("ERROR ! downloadBhavCopy, url " + url + " , Error Msg: " + e.getMessage());
 		} finally {
 			try {
 				if (rbc != null) {

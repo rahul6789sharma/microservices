@@ -37,12 +37,14 @@ public class IntraDayStrategyFileBuilder extends TimerTask {
 			if (!DateUtils.isWeekEndDay() && !NSEHolidayUtils.isHoliday()) {
 				// intra day new dir
 				List<String> files = new ArrayList<>();
-				files.add(bnfStrangle.itmStrangle3("ITMStrangle3@INTADAY~AUTO-Strategy_BANKNIFTY", AppConstant.STOCKSRIN_STRATEGY_DIR_IntraDay_BNF));
+				/*files.add(bnfStrangle.itmStrangle3("ITMStrangle3@INTADAY~AUTO-Strategy_BANKNIFTY", AppConstant.STOCKSRIN_STRATEGY_DIR_IntraDay_BNF));*/
 				files.add(bnfStrangle.itm2Strangle3("ITM2Strangle3@INTADAY~AUTO-Strategy_BANKNIFTY", AppConstant.STOCKSRIN_STRATEGY_DIR_IntraDay_BNF));
-				files.add(bnfStrangle.otmStrangle3("OTMStrangle3@INTADAY~AUTO-Strategy_BANKNIFTY", AppConstant.STOCKSRIN_STRATEGY_DIR_IntraDay_BNF));
+				/*files.add(bnfStrangle.otmStrangle3("OTMStrangle3@INTADAY~AUTO-Strategy_BANKNIFTY", AppConstant.STOCKSRIN_STRATEGY_DIR_IntraDay_BNF));*/
 				files.add(bnfStrategies.BuildStrategy3Straddle("Straddle3@INTADAY~AUTO-Strategy_BANKNIFTY", AppConstant.STOCKSRIN_STRATEGY_DIR_IntraDay_BNF));
 				files.add(bnfStrategies.ironButterfly("ITMIronFly@INTADAY~AUTO-Strategy_BANKNIFTY", AppConstant.STOCKSRIN_STRATEGY_DIR_IntraDay_BNF));
+
 				files.add(bnfStrategies.doubleCalender("DoubleCalendar@INTADAY~AUTO-Strategy_BANKNIFTY", AppConstant.STOCKSRIN_STRATEGY_DIR_IntraDay_BNF));
+
 				SendEmail.sentMail("IntraDay Strategy File created  : ", " files " + CommonUtils.getFilesName(files), "strategy Builder");
 			}
 		} catch (Exception e) {

@@ -14,7 +14,7 @@ import org.stocksrin.common.model.strategies.StrategyModel;
 
 public class StrategyUtil {
 
-	public static Map<String, Strategy> getStrategy2(String dir) {
+	public static Map<String, Strategy> getStrategy2(String dir) throws Exception {
 
 		Map<String, List<StrategyModel>> map = getStrategy(dir);
 
@@ -34,12 +34,16 @@ public class StrategyUtil {
 				underLyingName = UnderLying.BANKNIFTY;
 			} else if (underlaying.equals("NIFTY.csv")) {
 				underLyingName = UnderLying.NIFTY;
+			} else if (underlaying.equals("USDINR.csv")) {
+				underLyingName = UnderLying.USDINR;
 			}
 			Strategy strategy = new Strategy(underLyingName);
 			if (data != null) {
 				strategy.setTradeDate(data.getTradeDate());
 				strategy.setTradeSpotPrice(data.getSpot_close());
 			}
+			Long dte = DateUtils.getDte(data.getExpiry(), "ddMMMyyyy");
+			strategy.setDte(dte.toString());
 			String name = string.split("-Strategy")[0];
 			strategy.setStrategyModels(lst);
 			strategy.setStrategyName(name);

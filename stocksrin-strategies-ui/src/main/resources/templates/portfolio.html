@@ -98,25 +98,9 @@
 </body>
 <script>
 	$(document).ready(function() {
-		//query();
 		queryIntraDay();
-
 	});
 
-	function query() {
-
-		var xhttp = new XMLHttpRequest();
-		xhttp.onreadystatechange = function() {
-
-			if (this.readyState == 4 && this.status == 200) {
-				var jsonResponse = JSON.parse(this.responseText);
-				createDivFrmData(jsonResponse)
-				addData(jsonResponse, "sdTable");
-			}
-		};
-		xhttp.open("GET", "/bnf/strategies", true);
-		xhttp.send();
-	}
 
 	function queryIntraDay() {
 
@@ -134,13 +118,7 @@
 		xhttp.send();
 	}
 
-	function createDivFrmData(jsonResponse) {
-		var keyArr = Object.keys(jsonResponse);
-		for (var i = 0; i < keyArr.length; i++) {
-			createDiv(i);
-			createSDTable(i);
-		}
-	}
+
 
 	function createDivIntraDayFrmData(jsonResponse) {
 		var keyArr = Object.keys(jsonResponse);
@@ -154,10 +132,7 @@
 
 	function addData(jsonResponse, tableID) {
 		var keyArr = Object.keys(jsonResponse);
-		console.log(keyArr);
 		for (var i = 0; i < keyArr.length; i++) {
-			console.log(keyArr[i]);
-			//console.log(jsonResponse[keyArr[i]]);
 			addDataToStrategyTable(jsonResponse[keyArr[i]], tableID + i);
 		}
 
@@ -165,10 +140,10 @@
 
 	function addDataToStrategyTable(strategy, tableID) {
 		var jsonResponse = strategy.strategyModels
-		console.log(tableID);
-		console.log(strategy);
+
 		var keyArr = Object.keys(jsonResponse);
 
+		console.log("number of strategies " +keyArr.length)
 		var totalPremium = 0;
 		var totalPremiumLtp = 0;
 		var totalPl = 0;
@@ -176,9 +151,9 @@
 
 		var tr;
 		for (var i = 0; i < keyArr.length; i++) {
-
+			
 			var val = jsonResponse[keyArr[i]];
-
+			
 			tr = $('<tr/>');
 
 			var optionmoneyness=getITMOTM(val.strike, strategy.underlying_ltp, val.type);
@@ -253,7 +228,7 @@
 
 		
 		tr = $('<tr/>');
-		tr.append("<td class=highLightRow2 title=Total  colspan=8 align=left>"+ "Total PL : &nbsp [ " + (strategy.totalPL).toFixed(0) + " ] &nbsp &nbsp &nbsp  [ "+ strategy.underlying_ltp + " ] Diff [ "+ (strategy.underlying_ltp-strategy.tradeSpotPrice).toFixed(1) + " ]");
+		tr.append("<td class=highLightRow2 title=Total  colspan=8 align=left>"+ "Total PL : &nbsp [ " + (strategy.totalPL).toFixed(0) + " ] &nbsp &nbsp &nbsp  [ "+ strategy.underlying_ltp + " ] Diff [ "+ (strategy.underlying_ltp-strategy.tradeSpotPrice).toFixed(1) + " ]" + "-" + strategy.dataUpdatedAt);
 
 		$('#' + tableID).append(tr);
 		
@@ -280,6 +255,7 @@
 		var cell1 = row.insertCell(1);
 		cell1.setAttribute("colspan", "8");
 		cell1.innerHTML = "<b>" + strategy.strategyName + "</b>";
+		console.log(strategy.strategyName)
 
 	}
 
@@ -343,15 +319,6 @@
 		$("#sdDivIntraDay" + index).append(y);
 	}
 
-	function createDiv(index) {
-		var x = document.createElement("DIV");
-		x.setAttribute("id", "sdDiv" + index);
-		x.setAttribute("class", "col-xs-10 col-sm-10 col-md-6");
-		$("#mainTableDiv").append(x);
-
-		var y = document.createElement("hr");
-		$("#sdDiv" + index).append(y);
-	}
 
 	function createSDTableIntraDay(index) {
 		var x = document.createElement("TABLE");
@@ -380,31 +347,6 @@
 		// table Fotter 
 	}
 
-	function createSDTable(index) {
-		var x = document.createElement("TABLE");
-		x.setAttribute("id", "sdTable" + index);
-		x.setAttribute("class", "table-striped");
-		x.setAttribute("align", "center");
-		x.setAttribute("cellpadding", "40");
-		x.setAttribute("cellspacing", "2");
-		x.setAttribute("width", "80%");
-
-		$("#sdDiv" + index).append(x);
-		// table header
-		$("#sdTable" + index)
-				.append(
-						'<thead>'
-								/* + '<tr class="optionHead"><th colspan="6" class=whiteRightBorder> Previous Months </th> <th colspan="4" > NSE  </th></tr>' */
-
-								+ '<tr class="optionHead">'
-
-								+ '<th title="buyValue">Type</th><th title="buyValue">Expiry</th>   <th title="SellValue"> Qty </th> <th title="SellValue"> Strike </th><th title="net" class=whiteRightBorder > Entry Price</th>'
-								+ '<th title="buyValue">Current Price</th> <th title="SellValue"> Change </th><th title="net" class=whiteRightBorder > P&L</th>'
-
-								+ '</tr>' + '</thead>');
-
-		// table Fotter 
-	}
 </script>
 
 </html>

@@ -6,18 +6,33 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 public class DateUtils {
 	public static void main(String[] args) {
 		try {
-			String day = getCurrentDay();
-			int week=getCurrentWeek();
-
-			System.out.println(day);
-			System.out.println(week);
+			
+			System.out.println(getCurrentDay());
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	// formate ddMMMyyyy
+
+	public static long getDte(String expiry, String formate) throws Exception {
+		Date expiryDate = DateUtils.stringToDate(expiry, formate);
+		Date today = DateUtils.stringToDate(DateUtils.dateToString(new Date(), formate), formate);
+		long diff = expiryDate.getTime() - today.getTime();
+		return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+	}
+
+	public static String getTodayDate() {
+		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("ddMMMyyyy");
+		String dateStr = sdf.format(date).toUpperCase();
+		// 02May2017
+		return dateStr;
 	}
 
 	public static String getDayFromDate(String inputDate, String formate) throws Exception {
