@@ -35,11 +35,11 @@ public class BankNiftyNotificationTask extends TimerTask {
 
 				while (CommonUtils.getEveningTime()) {
 					if (!BankNiftyData.shortedExpiry.isEmpty()) {
-						String currentExpiry = BankNiftyData.shortedExpiry.first();
+						/*String currentExpiry = BankNiftyData.shortedExpiry.first();
 
 						checkSpotAlert(BankNiftyData.bnOptionData.get(currentExpiry).getSpot());
 
-						checkForMaxPainChange();
+						checkForMaxPainChange();*/
 						// BankNiftyOINotification.checkOIChange();
 					}
 

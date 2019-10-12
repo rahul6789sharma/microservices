@@ -3,13 +3,15 @@ package org.stocksrin.strategies.automation;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.stocksrin.collector.option.data.InMemoryStrategyies;
-import org.stocksrin.collector.option.data.utils.BreakEvenCalUtils;
-import org.stocksrin.common.model.strategies.Strategy;
-import org.stocksrin.common.model.strategies.Strategy.UnderLying;
+import org.stocksrin.common.model.trade.Strategy;
+import org.stocksrin.common.model.trade.UnderLyingInstrument;
 import org.stocksrin.common.utils.StrategyUtil;
 
 public class StrategyFileReader {
+	private static final Logger log = LoggerFactory.getLogger(StrategyFileReader.class);
 
 	public static synchronized void startManualStrategies(String starttegyDir) {
 		try {
@@ -25,11 +27,11 @@ public class StrategyFileReader {
 
 					Strategy startgy = strategyMap.get(string);
 
-					if (startgy.getUnderlying().equals(UnderLying.BANKNIFTY)) {
+					if (startgy.getUnderlying().equals(UnderLyingInstrument.BANKNIFTY)) {
 
 						try {
-							BreakEvenCalUtils.calculatebreakEven(startgy);
-							BreakEvenCalUtils.findBreakEven(startgy);
+							// BreakEvenCalUtils.calculatebreakEven(startgy);
+							// BreakEvenCalUtils.findBreakEven(startgy);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -41,17 +43,18 @@ public class StrategyFileReader {
 						// positional
 						InMemoryStrategyies.put(string, startgy, starttegyDir);
 
-					} else if (startgy.getUnderlying().equals(UnderLying.NIFTY)) {
+					} else if (startgy.getUnderlying().equals(UnderLyingInstrument.NIFTY)) {
 
 						// Result
 						InMemoryStrategyies.put(string, startgy, starttegyDir);
 
-					} else if (startgy.getUnderlying().equals(UnderLying.USDINR)) {
+					} else if (startgy.getUnderlying().equals(UnderLyingInstrument.USDINR)) {
 						InMemoryStrategyies.put(string, startgy, starttegyDir);
 					}
 
 					else {
-						System.out.println("****** Underlying unknown ****" + startgy.getUnderlying());
+						System.out.println(startgy);
+						log.error("****** Underlying unknown ****" + startgy.getUnderlying());
 					}
 				}
 			} finally {

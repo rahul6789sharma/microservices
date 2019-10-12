@@ -4,8 +4,8 @@ import java.text.DecimalFormat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.stocksrin.common.model.strategies.Strategy;
-import org.stocksrin.common.model.strategies.Strategy.UnderLying;
+import org.stocksrin.common.model.trade.Strategy;
+import org.stocksrin.common.model.trade.UnderLyingInstrument;
 import org.stocksrin.email.SendEmail;
 import org.stocksrin.strategies.utils.result.StrategyPrinterConsole;
 
@@ -15,11 +15,11 @@ public class PNLMail {
 	public static void targetMail(Strategy strategy) throws Exception {
 
 		String underlying;
-		if (UnderLying.NIFTY.equals(strategy.getUnderlying())) {
+		if (UnderLyingInstrument.NIFTY.equals(strategy.getUnderlying())) {
 			underlying = "NF";
-		} else if (UnderLying.BANKNIFTY.equals(strategy.getUnderlying())) {
+		} else if (UnderLyingInstrument.BANKNIFTY.equals(strategy.getUnderlying())) {
 			underlying = "BNF";
-		} else if (UnderLying.USDINR.equals(strategy.getUnderlying())) {
+		} else if (UnderLyingInstrument.USDINR.equals(strategy.getUnderlying())) {
 			underlying = "USDINR";
 		} else {
 			underlying = "OTHER";

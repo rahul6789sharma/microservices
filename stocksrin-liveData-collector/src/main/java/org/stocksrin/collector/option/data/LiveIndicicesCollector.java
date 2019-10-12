@@ -11,7 +11,6 @@ import java.util.TimerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.stocksrin.common.data.BankNiftyData;
 import org.stocksrin.common.data.IndicesData;
 import org.stocksrin.common.model.NSEIndice;
 import org.stocksrin.common.model.NSEIndicesData;
@@ -32,7 +31,6 @@ public class LiveIndicicesCollector extends TimerTask {
 	@Override
 	public void run() {
 		log.info("******* LiveIndicicesCollector Started**********");
-		BankNiftyData.clear();
 		try {
 			getAllData();
 		} catch (Exception e) {
@@ -66,12 +64,10 @@ public class LiveIndicicesCollector extends TimerTask {
 		NSEIndice[] d = obj.getData();
 
 		for (NSEIndice data2 : d) {
-
 			// data2.setDate(date);
 			String ltp = data2.getLastPrice().replaceAll(",", "");
 			data2.setLastPrice(ltp);
 			lst.add(data2);
-
 		}
 		IndicesData.setData(lst);
 		return lst;

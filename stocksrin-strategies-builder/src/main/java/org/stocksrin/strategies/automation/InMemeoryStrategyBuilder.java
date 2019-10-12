@@ -12,7 +12,7 @@ public class InMemeoryStrategyBuilder extends TimerTask {
 
 	private static long timeInteval = 120000;
 
-	// static long timeInteval = 50000;
+	//static long timeInteval = 50000;
 
 	@Override
 	public void run() {
@@ -41,18 +41,6 @@ public class InMemeoryStrategyBuilder extends TimerTask {
 				}
 			}
 
-			// after nifty usd inr only
-			while (CommonUtils.getEveningTimeUSDINR()) {
-				try {
-
-					StrategyFileReader.startManualStrategies(AppConstant.STOCKSRIN_STRATEGY_DIR_DAILY_USDINR_Strategy_AutoMated);
-
-					Thread.sleep(timeInteval);
-
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
 		}
 	}
 

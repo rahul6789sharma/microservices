@@ -71,16 +71,6 @@ public class ParticipantOIReaderTask extends TimerTask {
 		List<ParticipantOIModle> data0 = ParticapentOIData.data.get(lastEntry);
 		List<ParticipantOIModle> data1 = ParticapentOIData.data.get(currentEntry);
 
-		/*
-		 * for (ParticipantOIModle participantOIModle : data0) { if
-		 * (participantOIModle.getParticipantType().equals(ParticipantType.FII)) {
-		 * System.out.println(participantOIModle); } }
-		 * 
-		 * for (ParticipantOIModle participantOIModle : data1) { if
-		 * (participantOIModle.getParticipantType().equals(ParticipantType.FII)) {
-		 * System.out.println(participantOIModle); } }
-		 */
-//		System.out.println(getString());
 		StringBuilder data = getString();
 		System.out.println(data);
 		SendEmail.sentMail("Future OI All Particapent Data", "ERROR " + data.toString(), "liva-Data-Downloader");
@@ -119,10 +109,6 @@ public class ParticipantOIReaderTask extends TimerTask {
 					longdata.add(participantOIModle.getFutureIndexLong());
 					shortdata.add(participantOIModle.getFutureIndexShort());
 					net.add(participantOIModle.getFutureIndexLong() - participantOIModle.getFutureIndexShort());
-					// longdata.add(formatter.format((float)
-					// (participantOIModle.getFutureIndexLong()) / offset));
-					// shortdata.add(formatter.format((float)
-					// (participantOIModle.getFutureIndexShort()) / offset));
 				}
 			}
 		}

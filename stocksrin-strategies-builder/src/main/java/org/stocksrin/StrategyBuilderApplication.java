@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.stocksrin.email.SendEmail;
 
 @SpringBootApplication
-
 public class StrategyBuilderApplication {
 
 	public static boolean status;

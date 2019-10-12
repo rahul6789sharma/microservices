@@ -10,7 +10,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.stocksrin.collector.option.data.InMemoryStrategyies;
-import org.stocksrin.common.model.strategies.Strategy;
+import org.stocksrin.common.model.trade.Strategy;
 import org.stocksrin.common.utils.DateUtils;
 import org.stocksrin.common.utils.FileUtils;
 
@@ -38,6 +38,7 @@ public class StrategyResult {
 	}
 
 	public static synchronized void writeResult() {
+		// intraDay
 		Set<String> keys = InMemoryStrategyies.getStrategiesIntraDay().keySet();
 		for (String string : keys) {
 			Strategy lst = InMemoryStrategyies.getStrategiesIntraDay().get(string);
@@ -106,9 +107,6 @@ public class StrategyResult {
 			appendData("\n********************************************************************************************\n", file);
 			appendData(result.toString(), file);
 		}
-		log.info("------------");
-		log.info(result.toString());
-		log.info("------------");
 	}
 
 	private static void appendData(String data, String fileName) {
@@ -118,14 +116,10 @@ public class StrategyResult {
 		if (!file.exists()) {
 			throw new RuntimeException(fileName + " File not exist");
 		}
-
 		try (FileWriter fw = new FileWriter(file.getAbsoluteFile(), true); BufferedWriter bw = new BufferedWriter(fw);) {
-
 			bw.write("\n" + data);
-
 		} catch (IOException e) {
 			e.printStackTrace();
-
 		}
 	}
 }

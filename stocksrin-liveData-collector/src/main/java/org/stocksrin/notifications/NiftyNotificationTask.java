@@ -29,9 +29,10 @@ public class NiftyNotificationTask extends TimerTask {
 
 			while (CommonUtils.getEveningTime()) {
 				if (!NiftyData.shortedExpiry.isEmpty()) {
-					String currentExpiry = NiftyData.shortedExpiry.first();
+					
+				/*	String currentExpiry = NiftyData.shortedExpiry.first();
 					checkSpotAlert(NiftyData.optionData.get(currentExpiry).getSpot());
-					OINotification.OINotificationTask();
+					OINotification.OINotificationTask();*/
 				}
 				Thread.sleep(timeInteval);
 			}

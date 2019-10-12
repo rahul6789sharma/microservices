@@ -14,7 +14,7 @@ import org.stocksrin.common.model.option.OptionType;
 import org.stocksrin.common.utils.ComparatorBasedOnDate;
 
 @Controller
-public class BNFConsumeWebService {
+public class BNFConsumeWebService implements RestService {
 
 	private static final Logger log = LoggerFactory.getLogger(BNFConsumeWebService.class);
 
@@ -42,7 +42,19 @@ public class BNFConsumeWebService {
 		try {
 			data = restTemplate.getForObject(url, OptionModles.class);
 		} catch (Exception e) {
-			//e.printStackTrace();
+			// e.printStackTrace();
+			throw new Exception("Error url :" + uri);
+		}
+		return data;
+	}
+
+	public Double getFuturePrice() throws Exception {
+		String url = uri + "/bnf/futurePrice";
+		Double data = null;
+		try {
+			data = restTemplate.getForObject(url, Double.class);
+		} catch (Exception e) {
+			// e.printStackTrace();
 			throw new Exception("Error url :" + uri);
 		}
 		return data;
@@ -54,7 +66,7 @@ public class BNFConsumeWebService {
 		try {
 			data = restTemplate.getForObject(url, Double.class);
 		} catch (Exception e) {
-			//e.printStackTrace();
+			// e.printStackTrace();
 			throw new Exception("Error url :" + uri);
 		}
 		return data;
@@ -67,7 +79,7 @@ public class BNFConsumeWebService {
 		try {
 			data = restTemplate.getForObject(url, Double.class);
 		} catch (Exception e) {
-			//e.printStackTrace();
+			// e.printStackTrace();
 			throw new Exception("Error url :" + uri);
 		}
 		return data;
@@ -80,7 +92,7 @@ public class BNFConsumeWebService {
 		try {
 			data = restTemplate.getForObject(url, Double.class);
 		} catch (Exception e) {
-			//e.printStackTrace();
+			// e.printStackTrace();
 			throw new Exception("Error url :" + uri);
 		}
 		return data;
@@ -93,7 +105,7 @@ public class BNFConsumeWebService {
 		try {
 			data = restTemplate.getForObject(url, String.class);
 		} catch (Exception e) {
-			//e.printStackTrace();
+			// e.printStackTrace();
 			throw new Exception("Error url :" + uri);
 		}
 		return data;

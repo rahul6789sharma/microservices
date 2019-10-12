@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.stocksrin.StrategyBuilderApplication;
 import org.stocksrin.collector.option.data.InMemoryStrategyies;
-import org.stocksrin.common.model.strategies.Strategy;
-import org.stocksrin.common.model.strategies.Strategy.UnderLying;
-import org.stocksrin.common.model.strategies.StrategyModel;
+import org.stocksrin.common.model.trade.Strategy;
+import org.stocksrin.common.model.trade.StrategyModel;
+import org.stocksrin.common.model.trade.UnderLyingInstrument;
 import org.stocksrin.common.utils.CommonUtils;
 import org.stocksrin.common.utils.DateUtils;
 import org.stocksrin.common.utils.NSEHolidayUtils;
@@ -72,7 +72,7 @@ public class InMemeoryStrategyDataUpdaterUSDINR extends TimerTask {
 
 	private synchronized void updatePrice(Strategy strategy) throws Exception {
 
-		if (strategy.getUnderlying().equals(UnderLying.USDINR)) {
+		if (strategy.getUnderlying().equals(UnderLyingInstrument.USDINR)) {
 			List<StrategyModel> strategyModels = strategy.getStrategyModels();
 
 			double totalPL = 0;

@@ -1,16 +1,15 @@
 package org.stocksrin;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.stocksrin.collector.option.data.InMemoryStrategyies;
-import org.stocksrin.common.model.strategies.Strategy;
+import org.stocksrin.common.model.trade.Strategy;
 import org.stocksrin.restclient.BNFConsumeWebService;
 
 @RestController
@@ -23,18 +22,28 @@ public class Controller {
 	@Value("${logging.file}")
 	private String name;
 	private RestTemplate restTemplate = new RestTemplate();
-	@Autowired
-	BNFConsumeWebService bnfConsumeWebService;
 
-	@RequestMapping("/hello2")
+	@Autowired
+	private BNFConsumeWebService bnfConsumeWebService;
+
+	// http://13.127.1.60:8088/strategiesBuilder/hello
+	@RequestMapping("/hello")
 	public String sayHello() {
 
-		String response = restTemplate.exchange("http://stocskrin-demo/ltp/", HttpMethod.GET, null, new ParameterizedTypeReference<String>() {
-		}).getBody();
+		Set<String> daily = InMemoryStrategyies.getStrategies().keySet();
+		Set<String> intraday = InMemoryStrategyies.getStrategiesIntraDay().keySet();
+		StringBuilder s = new StringBuilder();
+		for (String string : daily) {
+			s.append(string);
+			s.append("\n");
+		}
 
-		System.out.println("Response Received as " + response);
+		for (String string : intraday) {
+			s.append(string);
+			s.append("\n");
+		}
 
-		return response;
+		return s.toString();
 	}
 
 	@RequestMapping("/strategies")
@@ -46,4 +55,5 @@ public class Controller {
 	public Map<String, Strategy> getIntraDayStrategyResult() {
 		return InMemoryStrategyies.getStrategiesIntraDay();
 	}
+
 }

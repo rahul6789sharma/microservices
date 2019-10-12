@@ -14,7 +14,7 @@ public class USDINRPriceLoader {
 
 	public static synchronized void fetchData() throws Exception {
 		loadLiveData();
-		log.info("USDINR : " + USDINRData.getSpot());
+		//log.info("USDINR : " + USDINRData.getSpot());
 	}
 
 	// return trading date

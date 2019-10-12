@@ -4,7 +4,6 @@ import java.util.TimerTask;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.stocksrin.common.data.BankNiftyData;
 
 public class LiveDataEveningUpdatedTask extends TimerTask {
 
@@ -13,7 +12,6 @@ public class LiveDataEveningUpdatedTask extends TimerTask {
 	@Override
 	public void run() {
 		log.info("******* LiveDataEveningUpdatedTask Started**********");
-		BankNiftyData.clear();
 		try {
 			PriceUtils.fetchData();
 		} catch (Exception e) {

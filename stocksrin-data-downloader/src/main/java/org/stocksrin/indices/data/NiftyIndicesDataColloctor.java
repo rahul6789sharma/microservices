@@ -22,7 +22,10 @@ public class NiftyIndicesDataColloctor {
 			// System.out.println(nifty);
 			// System.out.println(nifty.toCsv());
 			List<NSEIndice> data = getAllData();
-			System.out.println(data);
+			System.out.println("**********8");
+			data.forEach((i)->{
+				System.out.println(i.getName() + " :" + i.getChange());
+			});
 			// CommonUtils.appendData(nifty.toCsv(), STOCKSRIN_INDICES_NIFTY);
 		} catch (Exception e) {
 			e.printStackTrace();

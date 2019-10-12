@@ -60,7 +60,7 @@ public class AI extends TimerTask {
 			OptionModles optionModles = NiftyData.optionData.get(currentExpiry);
 			// double spot = NiftyData.getNFSpot();
 			// System.out.println("spot " + spot);
-			double atm = OptionUtils.getATMStrike(optionModles, 25);
+			double atm = optionModles.getAtmStrike();
 			// System.out.println("atm " + atm);
 			// System.out.println(IndicesData.getData());
 			// System.out.println("vix " + IndicesData.getVIX());

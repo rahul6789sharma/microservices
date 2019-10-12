@@ -1,15 +1,20 @@
 package org.stocksrin.common.data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.stocksrin.common.model.OptionChainOIData;
+import org.stocksrin.common.model.future.Future;
 import org.stocksrin.common.model.option.OptionModle;
 import org.stocksrin.common.model.option.OptionModles;
 import org.stocksrin.common.model.option.OptionType;
 import org.stocksrin.common.utils.ComparatorBasedOnDate;
+import org.stocksrin.common.utils.ExpiryDatesUtils;
 
 public class BankNiftyData {
 
@@ -18,11 +23,16 @@ public class BankNiftyData {
 
 	// expiry And its live option chain
 	public static Map<String, OptionModles> bnOptionData = new ConcurrentHashMap<>();
+	public static Map<String, Future> future = new ConcurrentHashMap<>();
 
 	// expiry and its maxpain
 	public static Map<String, Double> maxPains = new HashMap<>();
 
+	// new OI Data
+	public static Map<String, List<OptionChainOIData>> oiData = new ConcurrentHashMap<>();
+
 	public static void clear() {
+		System.out.println("************ Clearing ************ ");
 		shortedExpiry.clear();
 		bnOptionData.clear();
 		maxPains.clear();
@@ -37,6 +47,14 @@ public class BankNiftyData {
 			return null;
 		}
 
+	}
+
+	public static double getFuturePrice() {
+		if (!shortedExpiry.isEmpty()) {
+			Future data = future.get(ExpiryDatesUtils.getMonthlyExpiry(new ArrayList<>(shortedExpiry)));
+			return Double.parseDouble(data.getData()[0].getLastPrice().replace(",", ""));
+		}
+		return 0;
 	}
 
 	public static double getBNFSpot() {

@@ -4,22 +4,21 @@ import java.util.TimerTask;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.stocksrin.common.data.BankNiftyData;
+import org.springframework.stereotype.Controller;
 import org.stocksrin.common.utils.CommonUtils;
 import org.stocksrin.common.utils.DateUtils;
 import org.stocksrin.common.utils.NSEHolidayUtils;
 import org.stocksrin.email.SendEmail;
 
+@Controller
 public class LiveDataCollectortask extends TimerTask {
-	
+
 	private long timeInteval = 120000;
 	private static final Logger log = LoggerFactory.getLogger(LiveDataCollectortask.class);
 
-
 	@Override
 	public void run() {
-		log.info("******* LiveDataCollectortask Started**********");
-		BankNiftyData.clear();
+		log.info("******* LiveDataCollectortask Started **********");
 		try {
 			PriceUtils.fetchData();
 		} catch (Exception e) {

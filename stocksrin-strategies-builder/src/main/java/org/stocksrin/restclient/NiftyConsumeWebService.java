@@ -13,7 +13,7 @@ import org.stocksrin.common.model.option.OptionType;
 import org.stocksrin.common.utils.ComparatorBasedOnDate;
 
 @Controller
-public class NiftyConsumeWebService {
+public class NiftyConsumeWebService implements RestService{
 
 	@Autowired
 	private Environment env;
@@ -40,6 +40,20 @@ public class NiftyConsumeWebService {
 		try {
 			RestTemplate restTemplate = new RestTemplate();
 			data = restTemplate.getForObject(uri, OptionModles.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception("Error url :" + uri);
+		}
+		return data;
+	}
+
+	public Double getFuturePrice() throws Exception {
+		String uri = env.getProperty("microservice.liveData.url");
+		uri = uri + "/nifty/futurePrice";
+		Double data = null;
+		try {
+			RestTemplate restTemplate = new RestTemplate();
+			data = restTemplate.getForObject(uri, Double.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new Exception("Error url :" + uri);

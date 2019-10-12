@@ -5,8 +5,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.stocksrin.common.model.option.OptionType;
-import org.stocksrin.common.model.strategies.Strategy;
-import org.stocksrin.common.model.strategies.StrategyModel;
+import org.stocksrin.common.model.trade.Strategy;
+import org.stocksrin.common.model.trade.StrategyModel;
 import org.stocksrin.common.utils.DateUtils;
 
 public class StrategyPrinterConsole {

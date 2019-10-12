@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.stocksrin.common.model.strategies.Strategy;
-import org.stocksrin.common.model.strategies.StrategyModel;
+import org.stocksrin.common.model.trade.Strategy;
+import org.stocksrin.common.model.trade.StrategyModel;
 import org.stocksrin.common.utils.AppConstant;
 import org.stocksrin.strategies.automation.LockObject;
 

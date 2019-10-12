@@ -6,52 +6,21 @@ import java.util.List;
 import org.stocksrin.common.model.option.OptionModle;
 import org.stocksrin.common.model.option.OptionModles;
 import org.stocksrin.common.model.option.OptionType;
-import org.stocksrin.common.model.strategies.Strategy;
-import org.stocksrin.common.model.strategies.StrategyModel;
-import org.stocksrin.common.model.strategies.Strategy.UnderLying;
+import org.stocksrin.common.model.trade.FutureTrade;
+import org.stocksrin.common.model.trade.OptionTrade;
+import org.stocksrin.common.model.trade.Strategy;
+import org.stocksrin.common.model.trade.StrategyModel;
+import org.stocksrin.common.model.trade.Trade;
+import org.stocksrin.common.model.trade.TradeType;
+import org.stocksrin.common.model.trade.UnderLyingInstrument;
 import org.stocksrin.common.utils.DateUtils;
 
 public class StrategyUtils {
 
 	private final static double target = 1000;
 
-	public static double getATMStrike(OptionModles optionModles, double strikediff) {
-
-		double spot = optionModles.getSpot();
-
-		List<OptionModle> lst = optionModles.getOptionModle();
-		double atmStrike = 0.0;
-		for (OptionModle optionModle : lst) {
-
-			double diff = Math.abs(spot - optionModle.getStrike_price());
-			if (diff < strikediff) {
-				atmStrike = optionModle.getStrike_price();
-				break;
-			}
-		}
-
-		return atmStrike;
-	}
-
-	public static double getATMStrike(OptionModles optionModles, int strikediff) {
-
-		double spot = optionModles.getSpot();
-		List<OptionModle> lst = optionModles.getOptionModle();
-		double atmStrike = 0.0;
-		for (OptionModle optionModle : lst) {
-
-			double diff = Math.abs(spot - optionModle.getStrike_price());
-			if (diff < strikediff) {
-				atmStrike = optionModle.getStrike_price();
-				break;
-			}
-		}
-
-		return atmStrike;
-	}
-
 	public static Strategy buildStrategy(String name, List<OptionModle> optionModles, double strike, OptionType optionType, String expiry, double spotPrice, int qnt) throws Exception {
-		Strategy strategy = new Strategy(UnderLying.NIFTY);
+		Strategy strategy = new Strategy(UnderLyingInstrument.NIFTY);
 		strategy.setStrategyName(name);
 
 		for (OptionModle optionModle : optionModles) {
@@ -94,7 +63,6 @@ public class StrategyUtils {
 		strategyModel.setExpiry(expiry);
 		strategyModel.setType(OptionType.CALL);
 		strategyModel.setStrike(strike);
-		System.out.println(optionModle.getC_ltp());
 		strategyModel.setAvgPrice(optionModle.getC_ltp());
 		strategyModel.setQuantity(qnt);
 		strategyModel.setSpot_close(spotPrice);
@@ -109,4 +77,109 @@ public class StrategyUtils {
 		return strategyModel;
 	}
 
+	public static Strategy buildStrategy2(String name, List<OptionModle> optionModles, double strike, OptionType optionType, String expiry, double spotPrice, int qnt) throws Exception {
+		Strategy strategy = new Strategy(UnderLyingInstrument.NIFTY);
+		strategy.setStrategyName(name);
+
+		for (OptionModle optionModle : optionModles) {
+			if (optionModle.getStrike_price().equals(strike)) {
+				if (OptionType.PUT.equals(optionType)) {
+					StrategyModel strategyModel = StrategyModelBuilderPUT(optionModle, expiry, strike, spotPrice, qnt);
+					strategy.getStrategyModels().add(strategyModel);
+				} else if (OptionType.CALL.equals(optionType)) {
+					StrategyModel strategyModel = StrategyModelBuilderCALL(optionModle, expiry, strike, spotPrice, qnt);
+					strategy.getStrategyModels().add(strategyModel);
+				}
+			}
+		}
+		return strategy;
+	}
+
+	public static Trade buildTradeFutureTrade(double futureTradedPrice, OptionModles optionModles, String expiry, int quantity, String symbole) throws Exception {
+
+		Trade trade = new Trade(symbole, TradeType.FUTURE);
+
+		FutureTrade futureTrade = new FutureTrade();
+		futureTrade.setExpiry(expiry);
+		futureTrade.setFutureTradedPrice(futureTradedPrice);
+
+		trade.setFutureTrade(futureTrade);
+		trade.setQuantity(quantity);
+
+		trade.setDataUpdatedAt(optionModles.getLastDataUpdated());
+		trade.setTradeDate(getDate(optionModles.getLastDataUpdated()));
+		trade.setTradeDay(getDay(optionModles.getLastDataUpdated()));
+		trade.setTradeTime(getTime(optionModles.getLastDataUpdated()));
+		
+		trade.setTradePrice(optionModles.getSpot());
+
+		// optionTrade.setUnderlayingPrice_at_trade(underlayingPrice_at_trade);
+		return trade;
+	}
+
+	public static Trade buildTradeOptionTrade(OptionType optionType, OptionModles optionModles, double strike, String expiry, int quantity, String symbole) throws Exception {
+
+		Trade optionTrade = null;
+		for (OptionModle optionModle : optionModles.getOptionModle()) {
+			if (optionModle.getStrike_price().equals(strike)) {
+				optionTrade = build(optionType, optionModle, expiry, strike, optionModles.getSpot(), symbole, optionModles.getLastDataUpdated(), quantity);
+			}
+		}
+		// optionTrade.setUnderlayingPrice_at_trade(underlayingPrice_at_trade);
+		return optionTrade;
+	}
+
+	public static Trade build(OptionType optionType, OptionModle optionModle, String expiry, double strike, double spotPrice, String symbole, String tradeTime, int quantity) throws Exception {
+		OptionTrade optionTrade = new OptionTrade(optionType, expiry);
+		optionTrade.setStrike(strike);
+		long dte = DateUtils.getDte(expiry, "ddMMMyyyy");
+		optionTrade.setDte(dte);
+		Trade trade = new Trade(symbole, TradeType.OPTION);
+		if (OptionType.PUT.equals(optionType)) {
+			optionTrade.setOptionTradedPrice(optionModle.getP_ltp());
+			if (optionModle.getP_iv() != null) {
+				optionTrade.setIv(optionModle.getP_iv());
+			}
+		} else if (OptionType.CALL.equals(optionType)) {
+			optionTrade.setOptionTradedPrice(optionModle.getC_ltp());
+			if (optionModle.getC_iv() != null) {
+				optionTrade.setIv(optionModle.getC_iv());
+			}
+		}
+		trade.setTradePrice(spotPrice);
+		trade.setQuantity(quantity);
+		trade.setDataUpdatedAt(tradeTime);
+		trade.setTradeDate(getDate(tradeTime));
+		trade.setTradeDay(getDay(tradeTime));
+		trade.setTradeTime(getTime(tradeTime));
+		trade.setOptionTrade(optionTrade);
+		return trade;
+	}
+
+	private static String getDate(String time) throws Exception {
+		time = time.replace("IST", "").trim();
+		Date d = DateUtils.stringToDate(time, "MMM dd, yyyy HH:mm:ss");
+		return DateUtils.dateToString(d, "ddMMMyyyy");
+	}
+
+	private static String getTime(String time) throws Exception {
+		time = time.replace("IST", "").trim();
+		Date d = DateUtils.stringToDate(time, "MMM dd, yyyy HH:mm:ss");
+		return DateUtils.dateToString(d, "HH:mm:ss");
+	}
+
+	private static String getDay(String time) throws Exception {
+		time = time.replace("IST", "").trim();
+		Date d = DateUtils.stringToDate(time, "MMM dd, yyyy HH:mm:ss");
+		return DateUtils.dateToString(d, "EEEEE");
+	}
+
+	public static void main(String[] args) throws Exception {
+		String sDate = "Aug 30, 2019 15:30:30 IST";
+		sDate = sDate.replace("IST", "").trim();
+		Date d = DateUtils.stringToDate(sDate, "MMM dd, yyyy HH:mm:ss");
+		System.out.println(d);
+		String mon = DateUtils.dateToString(d, "ddMMMyyyy");
+		System.out.println(mon);
+	}
 }

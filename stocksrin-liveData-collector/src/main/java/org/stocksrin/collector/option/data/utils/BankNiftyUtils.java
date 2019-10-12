@@ -1,5 +1,6 @@
 package org.stocksrin.collector.option.data.utils;
 
+import org.stocksrin.common.model.InstrumentType;
 import org.stocksrin.common.model.option.MaxPains;
 import org.stocksrin.common.model.option.OptionModles;
 import org.stocksrin.common.utils.AppConstant;
@@ -25,7 +26,7 @@ public class BankNiftyUtils {
 		} else {
 			url = AppConstant.BANKNIFTY_WEEKLY_OPTION_URL_BY_Expiry + expiry;
 		}
-		return OptionUtils.getOptionChain(url, expiry);
+		return OptionUtils.getOptionChain(url, expiry, InstrumentType.BNF, "BANKNIFTY");
 	}
 
 

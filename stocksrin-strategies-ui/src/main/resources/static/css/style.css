@@ -67,13 +67,34 @@ td, th {
 }
 
 .itm {
-	background: #ededf9;
+	background: #fbf5cd;
 	text-align: right
+}
+
+.itmSupport {
+	background: #fbf5cd;
+	text-align: right;
+	border-top: 2px solid black;
+}
+
+
+
+.itmStrike {
+	background: #fbf5cd;
+	text-align: center;
+	font-weight: bold
 }
 
 .otm {
 	background: white;
 	text-align: right
+}
+
+
+.otmStrike {
+	background: white;
+	text-align: center;
+	font-weight: bold
 }
 
 .redNumberitm {

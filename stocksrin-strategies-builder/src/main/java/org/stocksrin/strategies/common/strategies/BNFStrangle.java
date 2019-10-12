@@ -1,5 +1,6 @@
 package org.stocksrin.strategies.common.strategies;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 
@@ -10,19 +11,20 @@ import org.springframework.stereotype.Controller;
 import org.stocksrin.common.model.option.OptionModle;
 import org.stocksrin.common.model.option.OptionModles;
 import org.stocksrin.common.model.option.OptionType;
-import org.stocksrin.common.model.strategies.Strategy;
-import org.stocksrin.common.model.strategies.Strategy.UnderLying;
+import org.stocksrin.common.model.trade.Strategy;
+import org.stocksrin.common.model.trade.UnderLyingInstrument;
 import org.stocksrin.common.utils.CommonUtils;
 import org.stocksrin.common.utils.DateUtils;
 import org.stocksrin.common.utils.FileUtils;
+import org.stocksrin.common.utils.options.ExpiryUtils;
 import org.stocksrin.email.SendEmail;
 import org.stocksrin.restclient.BNFConsumeWebService;
-import org.stocksrin.strategies.common.utils.BNFStrategyUtils;
+import org.stocksrin.strategies.common.utils.StrategyUtils;
 
 @Controller
 public class BNFStrangle {
 	private final Logger log = LoggerFactory.getLogger(BNFStrangle.class);
-	
+
 	@Autowired
 	private BNFConsumeWebService bnfConsumeWebService;
 
@@ -38,8 +40,9 @@ public class BNFStrangle {
 				Strategy strategy = strangle_300PointAway_protected();
 				CommonUtils.createStrategyFile(strategy, dir, fileName);
 			} else {
-				log.warn("Intra DayFile strategy already exist " + file );
-				//SendEmail.sentMail("Intra DayFile strategy already exist " + file, "", "Strategies-BUilder");
+				log.warn("Intra DayFile strategy already exist " + file);
+				// SendEmail.sentMail("Intra DayFile strategy already exist " + file, "",
+				// "Strategies-BUilder");
 			}
 
 		} catch (Exception e) {
@@ -58,13 +61,14 @@ public class BNFStrangle {
 				Strategy strategy = strangle_3OTM();
 				CommonUtils.createStrategyFile(strategy, dir, fileName);
 			} else {
-				log.warn("Intra DayFile strategy already exist " + file );
-				//SendEmail.sentMail("DayFile strategy already exist " + file, "", "Strategies-BUilder");
+				log.warn("Intra DayFile strategy already exist " + file);
+				// SendEmail.sentMail("DayFile strategy already exist " + file, "",
+				// "Strategies-BUilder");
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			SendEmail.sentMail("Critical Error in startegy file " + file, "","Strategies-BUilder");
+			SendEmail.sentMail("Critical Error in startegy file " + file, "", "Strategies-BUilder");
 		}
 		return file;
 	}
@@ -78,8 +82,9 @@ public class BNFStrangle {
 				Strategy strategy = strangle_3ITM();
 				CommonUtils.createStrategyFile(strategy, dir, fileName);
 			} else {
-				log.warn("Intra DayFile strategy already exist " + file );
-				//SendEmail.sentMail("DayFile strategy already exist " + file, "", "Strategies-BUilder");
+				log.warn("Intra DayFile strategy already exist " + file);
+				// SendEmail.sentMail("DayFile strategy already exist " + file, "",
+				// "Strategies-BUilder");
 			}
 
 		} catch (Exception e) {
@@ -98,8 +103,9 @@ public class BNFStrangle {
 				Strategy strategy = strangle_3ITM2();
 				CommonUtils.createStrategyFile(strategy, dir, fileName);
 			} else {
-				log.warn("Intra DayFile strategy already exist " + file );
-				//SendEmail.sentMail("DayFile strategy already exist " + file, "", "Strategies-BUilder");
+				log.warn("Intra DayFile strategy already exist " + file);
+				// SendEmail.sentMail("DayFile strategy already exist " + file, "",
+				// "Strategies-BUilder");
 			}
 
 		} catch (Exception e) {
@@ -112,12 +118,20 @@ public class BNFStrangle {
 	private Strategy strangle_3ITM() throws Exception {
 
 		SortedSet<String> allexpiries = bnfConsumeWebService.getAllExpiry();
-		String currentExpiry = BNFStrategyUtils.getExpiry(allexpiries);
+		String currentExpiry = null;
+
+		if (!ExpiryUtils.isTodayExpiry(allexpiries)) {
+			currentExpiry = allexpiries.first();
+		} else {
+			// go to new Expiry
+			List<String> expiries = new ArrayList<>(allexpiries);
+			currentExpiry = expiries.get(1);
+		}
 		Long dte = DateUtils.getDte(currentExpiry, "ddMMMyyyy");
 		// OptionModles optionModles =
 		// BankNiftyData.bnOptionData.get(currentExpiry);
 		OptionModles optionModles = bnfConsumeWebService.getOptionModel(currentExpiry);
-		double atmStrike = BNFStrategyUtils.getATMStrike(optionModles, 50);
+		double atmStrike = optionModles.getAtmStrike();
 
 		double ceLeg1 = atmStrike - 300;
 		double ceLeg2 = atmStrike - 200;
@@ -128,17 +142,17 @@ public class BNFStrangle {
 		double peLeg3 = atmStrike + 300;
 
 		List<OptionModle> lst = optionModles.getOptionModle();
-		Strategy strategy = new Strategy(UnderLying.BANKNIFTY);
+		Strategy strategy = new Strategy(UnderLyingInstrument.BANKNIFTY);
 		strategy.setStrategyName("BNF");
 		strategy.setDte(dte.toString());
 
-		Strategy leg1ce = BNFStrategyUtils.buildStrategy("BNF", lst, ceLeg1, OptionType.CALL, currentExpiry, optionModles.getSpot(), -lot);
-		Strategy leg2ce = BNFStrategyUtils.buildStrategy("BNF", lst, ceLeg2, OptionType.CALL, currentExpiry, optionModles.getSpot(), -lot);
-		Strategy leg3ce = BNFStrategyUtils.buildStrategy("BNF", lst, ceLeg3, OptionType.CALL, currentExpiry, optionModles.getSpot(), -lot);
+		Strategy leg1ce = StrategyUtils.buildStrategy("BNF", lst, ceLeg1, OptionType.CALL, currentExpiry, optionModles.getSpot(), -lot);
+		Strategy leg2ce = StrategyUtils.buildStrategy("BNF", lst, ceLeg2, OptionType.CALL, currentExpiry, optionModles.getSpot(), -lot);
+		Strategy leg3ce = StrategyUtils.buildStrategy("BNF", lst, ceLeg3, OptionType.CALL, currentExpiry, optionModles.getSpot(), -lot);
 
-		Strategy leg4pe = BNFStrategyUtils.buildStrategy("BNF", lst, peLeg1, OptionType.PUT, currentExpiry, optionModles.getSpot(), -lot);
-		Strategy leg5pe = BNFStrategyUtils.buildStrategy("BNF", lst, peLeg2, OptionType.PUT, currentExpiry, optionModles.getSpot(), -lot);
-		Strategy leg6pe = BNFStrategyUtils.buildStrategy("BNF", lst, peLeg3, OptionType.PUT, currentExpiry, optionModles.getSpot(), -lot);
+		Strategy leg4pe = StrategyUtils.buildStrategy("BNF", lst, peLeg1, OptionType.PUT, currentExpiry, optionModles.getSpot(), -lot);
+		Strategy leg5pe = StrategyUtils.buildStrategy("BNF", lst, peLeg2, OptionType.PUT, currentExpiry, optionModles.getSpot(), -lot);
+		Strategy leg6pe = StrategyUtils.buildStrategy("BNF", lst, peLeg3, OptionType.PUT, currentExpiry, optionModles.getSpot(), -lot);
 
 		// order is imp to visulization
 		strategy.getStrategyModels().addAll(leg1ce.getStrategyModels());
@@ -155,12 +169,20 @@ public class BNFStrangle {
 	private Strategy strangle_3ITM2() throws Exception {
 
 		SortedSet<String> allexpiries = bnfConsumeWebService.getAllExpiry();
-		String currentExpiry = BNFStrategyUtils.getExpiry(allexpiries);
+		String currentExpiry = null;
+
+		if (!ExpiryUtils.isTodayExpiry(allexpiries)) {
+			currentExpiry = allexpiries.first();
+		} else {
+			// go to new Expiry
+			List<String> expiries = new ArrayList<>(allexpiries);
+			currentExpiry = expiries.get(1);
+		}
 		Long dte = DateUtils.getDte(currentExpiry, "ddMMMyyyy");
 		// OptionModles optionModles =
 		// BankNiftyData.bnOptionData.get(currentExpiry);
 		OptionModles optionModles = bnfConsumeWebService.getOptionModel(currentExpiry);
-		double atmStrike = BNFStrategyUtils.getATMStrike(optionModles, 50);
+		double atmStrike = optionModles.getAtmStrike();
 
 		double ceLeg1 = atmStrike + 100;
 		double ceLeg2 = atmStrike + 200;
@@ -171,17 +193,17 @@ public class BNFStrangle {
 		// double peLeg3 = atmStrike - 300;
 
 		List<OptionModle> lst = optionModles.getOptionModle();
-		Strategy strategy = new Strategy(UnderLying.BANKNIFTY);
+		Strategy strategy = new Strategy(UnderLyingInstrument.BANKNIFTY);
 		strategy.setStrategyName("BNF");
 		strategy.setDte(dte.toString());
 
-		Strategy leg1ce = BNFStrategyUtils.buildStrategy("BNF", lst, ceLeg1, OptionType.CALL, currentExpiry, optionModles.getSpot(), -lot);
-		Strategy leg2ce = BNFStrategyUtils.buildStrategy("BNF", lst, ceLeg2, OptionType.CALL, currentExpiry, optionModles.getSpot(), -lot);
-		Strategy leg3ce = BNFStrategyUtils.buildStrategy("BNF", lst, atmStrike, OptionType.CALL, currentExpiry, optionModles.getSpot(), -lot);
+		Strategy leg1ce = StrategyUtils.buildStrategy("BNF", lst, ceLeg1, OptionType.CALL, currentExpiry, optionModles.getSpot(), -lot);
+		Strategy leg2ce = StrategyUtils.buildStrategy("BNF", lst, ceLeg2, OptionType.CALL, currentExpiry, optionModles.getSpot(), -lot);
+		Strategy leg3ce = StrategyUtils.buildStrategy("BNF", lst, atmStrike, OptionType.CALL, currentExpiry, optionModles.getSpot(), -lot);
 
-		Strategy leg1pe = BNFStrategyUtils.buildStrategy("BNF", lst, peLeg1, OptionType.PUT, currentExpiry, optionModles.getSpot(), -lot);
-		Strategy leg2pe = BNFStrategyUtils.buildStrategy("BNF", lst, peLeg2, OptionType.PUT, currentExpiry, optionModles.getSpot(), -lot);
-		Strategy leg3pe = BNFStrategyUtils.buildStrategy("BNF", lst, atmStrike, OptionType.PUT, currentExpiry, optionModles.getSpot(), -lot);
+		Strategy leg1pe = StrategyUtils.buildStrategy("BNF", lst, peLeg1, OptionType.PUT, currentExpiry, optionModles.getSpot(), -lot);
+		Strategy leg2pe = StrategyUtils.buildStrategy("BNF", lst, peLeg2, OptionType.PUT, currentExpiry, optionModles.getSpot(), -lot);
+		Strategy leg3pe = StrategyUtils.buildStrategy("BNF", lst, atmStrike, OptionType.PUT, currentExpiry, optionModles.getSpot(), -lot);
 
 		strategy.getStrategyModels().addAll(leg2pe.getStrategyModels());
 		strategy.getStrategyModels().addAll(leg1pe.getStrategyModels());
@@ -198,12 +220,20 @@ public class BNFStrangle {
 	private Strategy strangle_300PointAway_protected() throws Exception {
 
 		SortedSet<String> allexpiries = bnfConsumeWebService.getAllExpiry();
-		String currentExpiry = BNFStrategyUtils.getExpiry(allexpiries);
+		String currentExpiry = null;
+
+		if (!ExpiryUtils.isTodayExpiry(allexpiries)) {
+			currentExpiry = allexpiries.first();
+		} else {
+			// go to new Expiry
+			List<String> expiries = new ArrayList<>(allexpiries);
+			currentExpiry = expiries.get(1);
+		}
 		Long dte = DateUtils.getDte(currentExpiry, "ddMMMyyyy");
 		// OptionModles optionModles =
 		// BankNiftyData.bnOptionData.get(currentExpiry);
 		OptionModles optionModles = bnfConsumeWebService.getOptionModel(currentExpiry);
-		double atmStrike = BNFStrategyUtils.getATMStrike(optionModles, 50);
+		double atmStrike = optionModles.getAtmStrike();
 
 		double putStrike = atmStrike - 300;
 		double callStrike = atmStrike + 300;
@@ -212,15 +242,15 @@ public class BNFStrangle {
 		double callStrikeProtection = atmStrike + 500;
 
 		List<OptionModle> lst = optionModles.getOptionModle();
-		Strategy strategy = new Strategy(UnderLying.BANKNIFTY);
+		Strategy strategy = new Strategy(UnderLyingInstrument.BANKNIFTY);
 		strategy.setStrategyName("BNF");
 		strategy.setDte(dte.toString());
 
-		Strategy putlegProtect = BNFStrategyUtils.buildStrategy("BNF", lst, putStrikeProtection, OptionType.PUT, currentExpiry, optionModles.getSpot(), (lot * 3));
-		Strategy putleg = BNFStrategyUtils.buildStrategy("BNF", lst, putStrike, OptionType.PUT, currentExpiry, optionModles.getSpot(), -(lot * 3));
+		Strategy putlegProtect = StrategyUtils.buildStrategy("BNF", lst, putStrikeProtection, OptionType.PUT, currentExpiry, optionModles.getSpot(), (lot * 3));
+		Strategy putleg = StrategyUtils.buildStrategy("BNF", lst, putStrike, OptionType.PUT, currentExpiry, optionModles.getSpot(), -(lot * 3));
 
-		Strategy callLeg = BNFStrategyUtils.buildStrategy("BNF", lst, callStrike, OptionType.CALL, currentExpiry, optionModles.getSpot(), -(lot * 3));
-		Strategy callLegProtected = BNFStrategyUtils.buildStrategy("BNF", lst, callStrikeProtection, OptionType.CALL, currentExpiry, optionModles.getSpot(), (lot * 3));
+		Strategy callLeg = StrategyUtils.buildStrategy("BNF", lst, callStrike, OptionType.CALL, currentExpiry, optionModles.getSpot(), -(lot * 3));
+		Strategy callLegProtected = StrategyUtils.buildStrategy("BNF", lst, callStrikeProtection, OptionType.CALL, currentExpiry, optionModles.getSpot(), (lot * 3));
 
 		strategy.getStrategyModels().addAll(putlegProtect.getStrategyModels());
 		strategy.getStrategyModels().addAll(putleg.getStrategyModels());
@@ -233,12 +263,20 @@ public class BNFStrangle {
 	private Strategy strangle_3OTM() throws Exception {
 
 		SortedSet<String> allexpiries = bnfConsumeWebService.getAllExpiry();
-		String currentExpiry = BNFStrategyUtils.getExpiry(allexpiries);
+		String currentExpiry = null;
+
+		if (!ExpiryUtils.isTodayExpiry(allexpiries)) {
+			currentExpiry = allexpiries.first();
+		} else {
+			// go to new Expiry
+			List<String> expiries = new ArrayList<>(allexpiries);
+			currentExpiry = expiries.get(1);
+		}
 		Long dte = DateUtils.getDte(currentExpiry, "ddMMMyyyy");
 		// OptionModles optionModles =
 		// BankNiftyData.bnOptionData.get(currentExpiry);
 		OptionModles optionModles = bnfConsumeWebService.getOptionModel(currentExpiry);
-		double atmStrike = BNFStrategyUtils.getATMStrike(optionModles, 50);
+		double atmStrike = optionModles.getAtmStrike();
 
 		double ceLeg1 = atmStrike + 100;
 		double ceLeg2 = atmStrike + 200;
@@ -249,17 +287,17 @@ public class BNFStrangle {
 		double peLeg3 = atmStrike - 300;
 
 		List<OptionModle> lst = optionModles.getOptionModle();
-		Strategy strategy = new Strategy(UnderLying.BANKNIFTY);
+		Strategy strategy = new Strategy(UnderLyingInstrument.BANKNIFTY);
 		strategy.setStrategyName("BNF");
 		strategy.setDte(dte.toString());
 
-		Strategy leg1ce = BNFStrategyUtils.buildStrategy("BNF", lst, ceLeg1, OptionType.CALL, currentExpiry, optionModles.getSpot(), -lot);
-		Strategy leg2ce = BNFStrategyUtils.buildStrategy("BNF", lst, ceLeg2, OptionType.CALL, currentExpiry, optionModles.getSpot(), -lot);
-		Strategy leg3ce = BNFStrategyUtils.buildStrategy("BNF", lst, ceLeg3, OptionType.CALL, currentExpiry, optionModles.getSpot(), -lot);
+		Strategy leg1ce = StrategyUtils.buildStrategy("BNF", lst, ceLeg1, OptionType.CALL, currentExpiry, optionModles.getSpot(), -lot);
+		Strategy leg2ce = StrategyUtils.buildStrategy("BNF", lst, ceLeg2, OptionType.CALL, currentExpiry, optionModles.getSpot(), -lot);
+		Strategy leg3ce = StrategyUtils.buildStrategy("BNF", lst, ceLeg3, OptionType.CALL, currentExpiry, optionModles.getSpot(), -lot);
 
-		Strategy leg1pe = BNFStrategyUtils.buildStrategy("BNF", lst, peLeg1, OptionType.PUT, currentExpiry, optionModles.getSpot(), -lot);
-		Strategy leg2pe = BNFStrategyUtils.buildStrategy("BNF", lst, peLeg2, OptionType.PUT, currentExpiry, optionModles.getSpot(), -lot);
-		Strategy leg3pe = BNFStrategyUtils.buildStrategy("BNF", lst, peLeg3, OptionType.PUT, currentExpiry, optionModles.getSpot(), -lot);
+		Strategy leg1pe = StrategyUtils.buildStrategy("BNF", lst, peLeg1, OptionType.PUT, currentExpiry, optionModles.getSpot(), -lot);
+		Strategy leg2pe = StrategyUtils.buildStrategy("BNF", lst, peLeg2, OptionType.PUT, currentExpiry, optionModles.getSpot(), -lot);
+		Strategy leg3pe = StrategyUtils.buildStrategy("BNF", lst, peLeg3, OptionType.PUT, currentExpiry, optionModles.getSpot(), -lot);
 
 		strategy.getStrategyModels().addAll(leg3pe.getStrategyModels());
 		strategy.getStrategyModels().addAll(leg2pe.getStrategyModels());

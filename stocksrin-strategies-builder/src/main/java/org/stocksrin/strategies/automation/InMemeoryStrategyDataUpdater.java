@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.stocksrin.StrategyBuilderApplication;
 import org.stocksrin.collector.option.data.InMemoryStrategyies;
-import org.stocksrin.common.model.strategies.Strategy;
-import org.stocksrin.common.model.strategies.Strategy.UnderLying;
-import org.stocksrin.common.model.strategies.StrategyModel;
+import org.stocksrin.common.model.trade.Strategy;
+import org.stocksrin.common.model.trade.StrategyModel;
+import org.stocksrin.common.model.trade.UnderLyingInstrument;
 import org.stocksrin.common.utils.CommonUtils;
 import org.stocksrin.common.utils.DateUtils;
 import org.stocksrin.common.utils.NSEHolidayUtils;
@@ -51,7 +51,6 @@ public class InMemeoryStrategyDataUpdater extends TimerTask {
 						for (String string2 : keys) {
 							Strategy strategy = InMemoryStrategyies.getStrategies().get(string2);
 							updatePrice(strategy);
-							// StringBuilder result = StrategyPrinterConsole.print(strategy);
 							PNLMail.targetMail(strategy);
 						}
 
@@ -60,7 +59,6 @@ public class InMemeoryStrategyDataUpdater extends TimerTask {
 						for (String string2 : keys2) {
 							Strategy strategy = InMemoryStrategyies.getStrategiesIntraDay().get(string2);
 							updatePrice(strategy);
-							// StringBuilder result = StrategyPrinterConsole.print(strategy);
 							PNLMail.targetMail(strategy);
 						}
 					} finally {
@@ -83,7 +81,7 @@ public class InMemeoryStrategyDataUpdater extends TimerTask {
 
 	private synchronized void updatePrice(Strategy strategy) throws Exception {
 
-		if (strategy.getUnderlying().equals(UnderLying.BANKNIFTY)) {
+		if (strategy.getUnderlying().equals(UnderLyingInstrument.BANKNIFTY)) {
 			List<StrategyModel> strategyModels = strategy.getStrategyModels();
 			strategy.setUnderlying_ltp(bnfConsumeWebService.getSpotPrice());
 
@@ -99,7 +97,7 @@ public class InMemeoryStrategyDataUpdater extends TimerTask {
 
 				lastDataUpdateTime = bnfConsumeWebService.getLastDataUpdated(strategyModel.getExpiry());
 
-				if (ltp != null && ltp != 0.0  && ltp != 0) {
+				if (ltp != null && ltp != 0.0 && ltp != 0) {
 					strategyModel.setLtp(ltp);
 				}
 
@@ -111,7 +109,7 @@ public class InMemeoryStrategyDataUpdater extends TimerTask {
 			}
 			updateData(strategy, lastDataUpdateTime, totalPL);
 
-		} else if (strategy.getUnderlying().equals(UnderLying.NIFTY)) {
+		} else if (strategy.getUnderlying().equals(UnderLyingInstrument.NIFTY)) {
 			List<StrategyModel> strategyModels = strategy.getStrategyModels();
 
 			strategy.setUnderlying_ltp(niftyConsumeWebService.getSpotPrice());
@@ -127,7 +125,7 @@ public class InMemeoryStrategyDataUpdater extends TimerTask {
 
 				iv = niftyConsumeWebService.getIV(strategyModel.getExpiry(), strategyModel.getStrike(), strategyModel.getType());
 
-				if (ltp != null && ltp != 0.0  && ltp != 0) {
+				if (ltp != null && ltp != 0.0 && ltp != 0) {
 					strategyModel.setLtp(ltp);
 				}
 

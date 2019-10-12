@@ -8,8 +8,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.stocksrin.common.model.option.OptionType;
-import org.stocksrin.common.model.strategies.Strategy;
-import org.stocksrin.common.model.strategies.StrategyModel;
+import org.stocksrin.common.model.trade.Strategy;
+import org.stocksrin.common.model.trade.StrategyModel;
 
 public class BreakEvenCalUtils {
 
