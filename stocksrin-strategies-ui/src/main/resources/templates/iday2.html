@@ -45,6 +45,7 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.1/nv.d3.min.css">
 
 <style>
+
 table, th, td {
   border: 1px solid black;
   border-collapse: collapse;
@@ -53,6 +54,8 @@ th, td {
   padding: 5px;
   text-align: left;    
 }
+
+
 </style>
 <script async
 	src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
@@ -81,14 +84,24 @@ th, td {
 
 						
 			<div class="col-xs-12 col-sm-6  col-md-4">
-				<div id="changeInOIDiv"></div>				
+				<div id="niftyDiv">  Nifty : Last Data Updated at </div>
+				<div id="changeInOINiftyDIV"></div>	
+				<div id="niftyAVGPremiumDIV"></div>						
 			</div>
 			
 			<div class="col-xs-12 col-sm-6  col-md-4">
-				
-				<div id="totalAdvDecDiv"></div>
+				<div id="bnfDiv">  BankNifty : Last Data Updated at </div>
+				<div id="changeInOIBNFDIV"></div>	
+				<div id="BNFAVGPremiumDIV"></div>				
+			</div>
+			
+			<div class="col-xs-12 col-sm-6  col-md-4">
+				<div id="totalAdvDecDiv"></div>	
+			</div>
+			
+			
+			<div class="col-xs-12 col-sm-6  col-md-4">
 				<div id="advDecDiv"></div>
-				
 			</div>
 			
 		<div class="col-xs-12 col-sm-6  col-md-4">
@@ -138,83 +151,31 @@ th, td {
 
 				addDataToTable(jsonResponse);
 				console.log();
-				callPutGraph(getLacks(jsonResponse.nifty_change_ce_oi), getLacks(jsonResponse.nifty_change_pe_oi),getLacks(jsonResponse.bnf_change_ce_oi),
-				getLacks(jsonResponse.bnf_change_pe_oi),'callPutGraphNifty');
 				AdvancedDeclineGraph(jsonResponse.totalAdvance, jsonResponse.totalDecline,'advDecDiv');
 				advDecLineGraph(jsonResponse.totalAdvances, jsonResponse.totalDeclines, 'totalAdvDecDiv');
-				oiLineGraph(jsonResponse.nifty_change_pe_oi_lst, jsonResponse.nifty_change_ce_oi_lst,jsonResponse.bnf_change_pe_oi_lst, jsonResponse.bnf_change_ce_oi_lst, 'changeInOIDiv');
+				oiLineGraph(jsonResponse.nifty_change_ce_oi_lst, jsonResponse.nifty_change_pe_oi_lst, 'changeInOINiftyDIV', 'NIFTY Change In OI (lacks*)', jsonResponse.lastDataUpdated);
+				oiLineGraph(jsonResponse.bnf_change_ce_oi_lst, jsonResponse.bnf_change_pe_oi_lst, 'changeInOIBNFDIV', 'BNF Change In OI (lakcs*)', jsonResponse.lastDataUpdated);
+				
+				// premium decay Graph
 
-
+				oiLineGraph(jsonResponse.nifty_ce_avg_premium, jsonResponse.nifty_pe_avg_premium, 'niftyAVGPremiumDIV', 'Nifty AVG Premium Decay', jsonResponse.lastDataUpdated);
+				oiLineGraph(jsonResponse.bnf_ce_avg_premium, jsonResponse.bnf_pe_avg_premium, 'BNFAVGPremiumDIV', 'BNF AVG Premium Decay', jsonResponse.lastDataUpdated);
+				
+				appendData('niftyDiv', jsonResponse.lastDataUpdated);
+				
+				appendData('bnfDiv', jsonResponse.lastDataUpdated);
 			}
 		};
 
 		xhttp.open("GET", "/oi/intraDayData", true);
 		xhttp.send();
 	}
-	
-	
-function callPutGraph(Ncalls, Nputs, bnfcalls, bnfputs, divID) {
 
-		Highcharts.chart(divID, {
-			chart : {
-				type : 'column'
-			},
-			title : {
-				text : ''
-			},
-			subtitle : {
-				text : 'Change in Open Interest'
-			},
-			xAxis : {
-				type : 'category',
-				labels : {
-					rotation : -0,
-					style : {
-						fontSize : '13px',
-					// fontFamily: 'Verdana, sans-serif'
-					}
-				}
-			},
-			yAxis : {
-				labels : {
-					enabled : false
-				},
+function appendData(divID, data){
+	var div = document.getElementById(divID);
+	div.innerHTML += data;
+}
 
-				title : {
-					text : ''
-				},
-				visible : false
-			},
-			legend : {
-				enabled : false
-			},
-
-			exporting : {
-				enabled : false
-			},
-			tooltip : {
-				pointFormat : '<b>{point.y:.1f} </b>'
-			},
-			series : [ {
-				name : 'OI',
-				data : [ [ 'NPuts', Nputs ], [ 'NCalls', Ncalls] , [ 'BnfPuts', bnfputs], [ 'BnfCalls', bnfcalls]],
-				
-				dataLabels : {
-					enabled : true,
-					rotation : -90,
-					color : '#FFFFFF',
-					align : 'right',
-					format : '{point.y:.1f}', // one decimal
-					y : 10, // 10 pixels down from the top
-					style : {
-						fontSize : '13px',
-						fontFamily : 'Verdana, sans-serif'
-					}
-				}
-			} ]
-		});
-
-	}
 	
 	function AdvancedDeclineGraph(adv, dec, divID) {
 
@@ -322,9 +283,13 @@ function callPutGraph(Ncalls, Nputs, bnfcalls, bnfputs, divID) {
 	function advDecLineGraph(advances, decline, divID){
 		Highcharts.chart(divID, {
 
+		chart: {
+        height: (9 / 16 * 100) + '%' // 16:9 ratio
+		},
 		title: {
 			text: 'Advance Declined'
 		},
+
 		yAxis: {
 			title: {
 				text: ''
@@ -341,32 +306,37 @@ function callPutGraph(Ncalls, Nputs, bnfcalls, bnfputs, divID) {
 	  });
 	}
 	
-	function oiLineGraph(niftyPEOI, niftyCEOI,bnfPEOI, nbnfCEOI, divID){
+	function oiLineGraph(ceChangeINOI, peChangeINOI,divID , title , lastUpdatedTime){
 		Highcharts.chart(divID, {
-
+		
+		chart: {
+		    spacingBottom: 3,
+			marginBottom: 50,
+			height: (9 / 16 * 100) + '%' // 16:9 ratio
+			
+		},
 		title: {
-			text: 'Change IN OI'
+			text: title
 		},
 		yAxis: {
 			title: {
 				text: ''
 			}
 		},
+		exporting: {
+			enabled: false
+		},
 		series: [
 		{
-			name: 'Nifty PE',
-			data: niftyPEOI
+			showInLegend: false,
+			name: 'CE',
+			data: ceChangeINOI
 		}, {
-			name: 'NIFTY CE',
-			data: niftyCEOI
-		},
-				{
-			name: 'BNF PE',
-			data: bnfPEOI
-		}, {
-			name: 'BNF CE',
-			data: nbnfCEOI
+			showInLegend: false,
+			name: 'PE',
+			data: peChangeINOI
 		}
+		
 		],
 
 	  });

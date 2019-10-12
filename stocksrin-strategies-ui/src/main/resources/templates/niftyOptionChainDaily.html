@@ -62,26 +62,22 @@
 		style="padding-right: 0; padding-left: 0;">
 		
 		<div class="banner include-nav" style="background-color: #34495e;">
-
 			<div ng-include="'pages/header.htm'"></div>
-
 		</div>
-
-		<!--left-->
-		<div class=" col-xs-12 col-sm-2 col-md-2" style="padding-top: 10px;">
-		
-		</div>
-		<!--/left-->
-
 
 		<!--center-->
-		<div class="col-xs-12 col-sm-10  col-md-10">
-			
-			<div id="mainTableDiv"></div>
-
+		<div class="col-xs-12 col-sm-6 col-md-6">
+			Expiry : <input type="date" id="myDate" > &nbsp; <button onclick="loadData()">Load</button>
+			<div id="mainTableDiv">
+			</div>		
 		</div>
-
-
+		
+		<div class="col-xs-12 col-sm-6 col-md-6">
+			<div id="totalOIDivMain"></div>	
+			<div id="changeOIDivMain"></div>				
+		</div>
+		<hr>
+		<div ng-include="'pages/add.html'"></div>
 	</div>
 
 
@@ -102,6 +98,36 @@
 
 
 <script>
+
+var monthNames = ["", "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+  "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
+];
+
+function loadData() {
+
+  var x = document.getElementById("myDate").value;
+
+  var res = x.split("-");
+  var singeldate=res[2];
+  if(res[2].indexOf(0) !=1){
+   var singeldate=res[2].replace("0","");
+  }
+  
+  
+  var date=singeldate+monthNames[parseInt(res[1])]+res[0]
+  var mySelatcetdDate = res[0];
+
+  var expirySelecteddate = localStorage.getItem("expirySelecteddate");
+  
+  if(expirySelecteddate == null){
+	expirySelecteddate = date;
+  }
+  localStorage.setItem("expirySelecteddate", date);
+  
+  window.location.reload();
+ 
+}
+
 	$(document).ready(function() {
 		query()
 	});
@@ -112,76 +138,199 @@
 		xhttp.onreadystatechange = function() {
 
 			if (this.readyState == 4 && this.status == 200) {
-				var jsonResponse = JSON.parse(this.responseText);
-				//console.log(jsonResponse);
-				createDivFrmData(jsonResponse);
+				
+				if(this.responseText){
+					var jsonResponse = JSON.parse(this.responseText);
+				    createDivFrmData(jsonResponse);
+				}else{
+					console.log("NO data Found")
+				}
+				
 			}
 		};
-		xhttp.open("GET", "/oi/expiryDayoptionChain", true);
+		var expirySelecteddate = localStorage.getItem("expirySelecteddate");
+		var url ="/optionChainRestController/optionChain?expiry="+expirySelecteddate;
+		console.log(url);
+		xhttp.open("GET", url, true);
 		xhttp.send();
 	}
 	
 	function createDivFrmData(jsonResponse) {
-		console.log(jsonResponse)
 		var keyArr = Object.keys(jsonResponse);
 		for (var i = 0; i < keyArr.length; i++) {
 			createDiv(i);
+			createDivTotalOI(i);
 			createOptionTable(i);
+			//createDivChangeOI(i);
 		}
 		addDataTotable(jsonResponse)
+		var data=jsonResponse.optionModle;
+		drawCallOI(jsonResponse);
 	}
 	
 	function createDiv(index) {
 		var x = document.createElement("DIV");
 		x.setAttribute("id", "sdDiv" + index);
-		x.setAttribute("class", "col-xs-10 col-sm-10 col-md-10");
+		x.setAttribute("style", "height:850px; ");
+		//x.setAttribute("class", "col-xs-10 col-sm-10 col-md-10");
 		$("#mainTableDiv").append(x);
-
 		var y = document.createElement("hr");
 		$("#sdDiv" + index).append(y);
 	}
 	
+	function createDivTotalOI(index) {
+		var x = document.createElement("DIV");
+		x.setAttribute("id", "oidiv" + index);
+		x.setAttribute("style", "height:900px; margin-top: 5px");
+		//x.setAttribute("class", "col-xs-10 col-sm-10 col-md-10");
+		$("#totalOIDivMain").append(x);
+	
+		var x = document.createElement("DIV");
+		x.setAttribute("id", "totalOIDiv" + index);
+	
+		//x.setAttribute("class", "col-xs-10 col-sm-10 col-md-10");
+		$("#oidiv"+index).append(x);
+		
+		var xx = document.createElement("DIV");
+		xx.setAttribute("id", "changeOIDiv" + index);
+		$("#oidiv"+index).append(xx);
+		
+		var y = document.createElement("hr");
+		$("#changeOIDiv" + index).append(y);
+	}
+	
+	function drawCallOI(jsonResponse) {
+		
+		var keyArr = Object.keys(jsonResponse);
+		for (var i = 0; i < keyArr.length; i++) {
+		
+				var strikePrice = [];
+				var callOI = [];
+				var putOI = [];
+				var callChangeINoI = [];
+				var putChangeINoI = [];
+				var expiry = jsonResponse[i].expiry
+				var spot = jsonResponse[i].spot;
+				var lastDataUpdated = jsonResponse[i].lastDataUpdated;
+				//console.log(expiry);
+				//console.log(spot);
+				var optionModle = jsonResponse[i].optionModle;
+				for (var j = 0; j < optionModle.length; j++) {	
+					if (optionModle[j].strike_price < spot) {
+
+						//if (optionModle[j].p_change_oi != null && optionModle[j].p_change_oi >10000) {
+
+							strikePrice.push(optionModle[j].strike_price);
+							callOI.push(getLacks(optionModle[j].c_oi));
+							putOI.push(getLacks(optionModle[j].p_oi));
+							callChangeINoI.push(getLacks(optionModle[j].c_change_oi));
+							putChangeINoI.push(getLacks(optionModle[j].p_change_oi));
+						//}
+					} 
+					else {
+
+						//if (optionModle[j].c_change_oi != null && optionModle[j].c_change_oi> 10000) {
+
+							strikePrice.push(optionModle[j].strike_price);
+							callOI.push(getLacks(optionModle[j].c_oi));
+							putOI.push(getLacks(optionModle[j].p_oi));
+							callChangeINoI.push(getLacks(optionModle[j].c_change_oi));
+							putChangeINoI.push(getLacks(optionModle[j].p_change_oi));
+						//}
+					}
+
+				}
+				drawTotalOI('Total OI' ,'totalOIDiv'+i,strikePrice, callOI, putOI, expiry, lastDataUpdated)
+				drawTotalOI('Change in OI','changeOIDiv'+i,strikePrice, callChangeINoI, putChangeINoI, expiry, lastDataUpdated)
+		}
+	}
+	
+	function drawTotalOI(heading, containerID, strikePrice, callOI, putOI, expiry, lastDataUpdated) {
+
+		Highcharts.chart(containerID, {
+			chart : {
+				type : 'bar',
+				inverted : false
+			},
+			title : {
+				text : ''
+			},
+			subtitle : {
+				text : heading+ '   Expiry:' + expiry + " , DataUpdated " + lastDataUpdated
+			},
+			xAxis : {
+				categories : strikePrice
+			},
+			yAxis : {
+				title : {
+					text : 'Open Interest'
+				}
+			},
+			plotOptions : {
+				bar : {
+					dataLabels : {
+						enabled : true
+					},
+					enableMouseTracking : true
+				}
+
+			},
+			series : [ {
+				name : 'CALL',
+				data : callOI
+			}, {
+				name : 'PUT',
+				data : putOI
+			} ]
+		});
+	}
+	
 	function addDataTotable(data){
 		var keyArr = Object.keys(data);
+		
 		for (var i = 0; i < keyArr.length; i++) {
 			
 			var oc = data[i].optionModle;
 			for (var j = 0; j < oc.length; j++) {
 				tr = $('<tr/>');
+				
+				if(oc[j].strike_price  == data[i].atmStrike ){
+					console.log(data[i].atmStrike)
+					console.log("range")
+					console.log(oc[j].c_ltp + oc[j].p_ltp)
+				}
 				if(data[i].atmStrike > oc[j].strike_price ){
-					tr.append("<td class=itm>" + oc[j].c_oi + "</td>");
-					tr.append("<td class=itm>" + oc[j].c_change_oi + "</td>");
+					tr.append("<td class=itm>" + getLacks(oc[j].c_oi) + "</td>");
+					tr.append("<td class=itm>" + getLacks(oc[j].c_change_oi) + "</td>");
 					tr.append("<td class=itm>" + oc[j].c_volume + "</td>");
 					
-					tr.append("<td class=itm>" + (oc[j].c_ltp -(data[i].spot - oc[j].strike_price) ).toFixed(1) + "</td>");
+					tr.append("<td class=itm>" + oc[j].c_iv + "</td>");
 					
 					tr.append("<td class=itm>" + oc[j].c_ltp + "</td>");
 					tr.append("<td class=itmStrike >" + oc[j].strike_price + "</td>");
 				}else{
-					tr.append("<td class=otm>" + oc[j].c_oi + "</td>");
-					tr.append("<td class=otm>" + oc[j].c_change_oi + "</td>");
+					tr.append("<td class=otm>" + getLacks(oc[j].c_oi) + "</td>");
+					tr.append("<td class=otm>" + getLacks(oc[j].c_change_oi) + "</td>");
 					tr.append("<td class=otm>" + oc[j].c_volume + "</td>");
 					
-					tr.append("<td class=otm>" + oc[j].c_ltp + "</td>");
+					tr.append("<td class=otm>" + oc[j].c_iv + "</td>");
 					tr.append("<td class=otm>" + oc[j].c_ltp + "</td>");
 					tr.append("<td class=otmStrike>" + oc[j].strike_price + "</td>");
 				}
 				if(data[i].atmStrike <= oc[j].strike_price ){
 					tr.append("<td class=itm>" + oc[j].p_ltp + "</td>");
-					tr.append("<td class=itm>" + (oc[j].p_ltp -(oc[j].strike_price - data[i].spot) ).toFixed(1) + "</td>");
+					tr.append("<td class=itm>" + oc[j].p_iv + "</td>");
 					
 					tr.append("<td class=itm>" + oc[j].p_volume + "</td>");
-					tr.append("<td class=itm>" + oc[j].p_change_oi + "</td>");
-					tr.append("<td class=itm>" + oc[j].p_oi + "</td>");
+					tr.append("<td class=itm>" + getLacks(oc[j].p_change_oi) + "</td>");
+					tr.append("<td class=itm>" + getLacks(oc[j].p_oi) + "</td>");
 				}else{
 					tr.append("<td class=otm>" + oc[j].p_ltp + "</td>");
-					tr.append("<td class=otm>" + oc[j].p_ltp + "</td>");
+					tr.append("<td class=otm>" + oc[j].p_iv + "</td>");
 					tr.append("<td class=otm>" + oc[j].p_volume + "</td>");
-					tr.append("<td class=otm>" + oc[j].p_change_oi + "</td>");
-					tr.append("<td class=otm>" + oc[j].p_oi + "</td>");
+					tr.append("<td class=otm>" + getLacks(oc[j].p_change_oi) + "</td>");
+					tr.append("<td class=otm>" + getLacks(oc[j].p_oi) + "</td>");
 				}
-				
-				
 				$('#sdTable'+i).append(tr);
 			}
 			
@@ -232,8 +381,8 @@
 					
 							+ '<th title="Open Interest">OI</th> <th title="Change OI"> Change in OI</th>'
 							+ '<th title="No. of Contracts traded">Volume</th>'
-							+ '<th title="TimeValue">TimeValue</th>  <th title="Last Traded Price">LTP</th> <th title="Strike Price">Strike Price</th>'
-							+ '<th title="Last Traded Price">LTP</th> <th title="TimeValue">TimeValue</th> <th title="No. of Contracts traded">Volume</th>'
+							+ '<th title="IV">IV</th>  <th title="Last Traded Price">LTP</th> <th title="Strike Price">Strike Price</th>'
+							+ '<th title="Last Traded Price">LTP</th> <th title="IV">IV</th> <th title="No. of Contracts traded">Volume</th>'
 							+ '<th title="Change OI"> Change in OI</th><th title="Open Interest">OI</th>'
 							
 							+ '</tr>' + '</thead>');
@@ -246,6 +395,10 @@
 							+ '<td id="pe_oi_total" ><b></b></td> <td><b></b></td>  <td ><b></b></td> <td ><b></b></td>'
 							+ '</tr></tfoot>');
 }
+
+function getLacks(num) {
+		return parseFloat((num / 100000).toFixed(2));
+	}
 </script>
 
 </html>

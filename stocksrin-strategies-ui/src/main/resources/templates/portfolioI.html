@@ -45,7 +45,7 @@
 <meta name="google-site-verification"
 	content="RiMM3DplmIgwoDQbESmxiQeM8vPKaqAmUu2UkG6Hq0U" />
 
-<meta http-equiv="refresh" content="300" />
+<meta http-equiv="refresh" content="500" />
 </head>
 
 <script async
@@ -73,7 +73,7 @@
 		<!--center-->
 		<div class="col-xs-12 col-sm-12  col-md-12">
 			<div id="mainTableDivIntraDay" class="row"></div>
-			<hr>
+		
 			<div id="mainTableDiv" class="row"></div>
 
 		</div>
@@ -110,11 +110,12 @@
 
 			if (this.readyState == 4 && this.status == 200) {
 				var jsonResponse = JSON.parse(this.responseText);
+				//console.log(jsonResponse);
 				createDivFrmData(jsonResponse)
 				addData(jsonResponse, "sdTable");
 			}
 		};
-		xhttp.open("GET", "/bnf/strategies", true);
+		xhttp.open("GET", "/dbStrategyRestController/intadayStrategies", true);
 		xhttp.send();
 	}
 
@@ -122,122 +123,93 @@
 		var keyArr = Object.keys(jsonResponse);
 		for (var i = 0; i < keyArr.length; i++) {
 			createDiv(i);
-			createSDTable(i);
+			createPLTable(i);
 		}
 	}
 
 	function addData(jsonResponse, tableID) {
 		var keyArr = Object.keys(jsonResponse);
 		console.log(keyArr);
+		
 		for (var i = 0; i < keyArr.length; i++) {
-
 			addDataToStrategyTable(jsonResponse[keyArr[i]], tableID + i);
 		}
-
 	}
 
 	function addDataToStrategyTable(strategy, tableID) {
-		var jsonResponse = strategy.strategyModels
+		var trades = strategy.trades
+		var keyArr = Object.keys(trades);
 
-		var keyArr = Object.keys(jsonResponse);
-		console.log("number of strategies " +keyArr.length)
 		var totalPremium = 0;
 		var totalPremiumLtp = 0;
 		var totalPl = 0;
 		var totalChange = 0;
 
+		var tradeTime;
+		var tradeDay;
+		var symbole;
 		var tr;
-		for (var i = 0; i < keyArr.length; i++) {
-
-			var val = jsonResponse[keyArr[i]];
-
+		for (var i = 0; i < trades.length; i++) {
+		
+			var trade = trades[keyArr[i]];
+			symbole=trade.symbole;
+			tradeDay=trade.tradeDay;
+			tradeTime=trade.tradeTime;
+			console.log(trade)
 			tr = $('<tr/>');
+			tr.append("<td class=oddRow>" + trade.tradeType + "</td>");
+			tr.append("<td class=evenRow>" + trade.quantity + "</td>");
+			
+			    tr.append("<td class=oddRow>" + trade.derivativeTrade.strike + " : "  + trade.derivativeTrade.optionType +"</td>");
+				tr.append("<td class=oddRow>" + trade.derivativeTrade.expiry + "</td>");
+				tr.append("<td class=oddRow>" + trade.tradedPrice.toFixed(2) + "</td>");
+				tr.append("<td class=evenRow>" + trade.ltp + "</td>");
+		
+			
+			
+			if(trade.tradeType == "OPTION"){
+				var change = trade.ltp - trade.tradedPrice;
+				tr.append("<td class=oddRow>" + change.toFixed(1) + "</td>");
+				var pl = trade.quantity * change;
+				var totalPlFinal = parseInt(pl);
+				
+				if (totalPlFinal > 0) {
+					tr.append("<td  class=positiveValue>" + totalPlFinal.toFixed(1) + "</td>");
+				} else {
+					tr.append("<td  class=negitiveValue>" + totalPlFinal.toFixed(1) + "</td>");
+				}
 
-			var optionmoneyness = getITMOTM(val.strike,
-					strategy.underlying_ltp, val.type);
-			if (optionmoneyness == "ITM") {
-				tr.append("<td class=evenRow>" + val.type + "</td>");
-				tr.append("<td class=evenRow>" + val.expiry + "</td>");
-			} else {
-				tr.append("<td class=oddRow>" + val.type + "</td>");
-				tr.append("<td class=oddRow>" + val.expiry + "</td>");
+				
+			} else if (trade.tradeType == "FUTURE"){
+				var change = trade.futureTrade.futureLTP - trade.futureTrade.futureTradedPrice;
+				tr.append("<td class=oddRow>" + change.toFixed(1) + "</td>");
+				var pl = trade.quantity * change;
+				var totalPlFinal = parseInt(pl);
+				
+				if (totalPlFinal > 0) {
+					tr.append("<td  class=positiveValue>" + totalPlFinal.toFixed(1) + "</td>");
+				} else {
+					tr.append("<td  class=negitiveValue>" + totalPlFinal.toFixed(1) + "</td>");
+				}
+				
 			}
-
-			tr.append("<td class=oddRow>" + val.quantity + "</td>");
-			tr.append("<td class=oddRow>" + val.strike + "</td>");
-			tr.append("<td class=oddRow>" + val.avgPrice + "</td>");
-			tr.append("<td class=oddRow>" + val.ltp + "</td>");
-			var change = val.ltp - val.avgPrice;
-			totalChange = totalChange + change;
-			tr.append("<td class=oddRow>" + change.toFixed(1) + "</td>");
-
-			var pl = val.quantity * change;
-			totalPl = totalPl + pl;
-			var totalPlFinal = parseInt(pl);
-
-			if (totalPlFinal > 0) {
-
-				tr.append("<td  class=positiveValue>" + totalPlFinal + "</td>");
-			} else {
-
-				tr.append("<td  class=negitiveValue>" + totalPlFinal + "</td>");
-			}
-
-			var extrinsic = getExtensricValue(val.strike,strategy.underlying_ltp, val.ltp, val.type)
-
-			tr.append("<td  class=oddRow title=Total>" + extrinsic + "</td>");
-
 			$('#' + tableID).append(tr);
-
-			totalPremium = totalPremium + val.avgPrice;
-			totalPremiumLtp = totalPremiumLtp + val.ltp;
 		}
+		
 		tr = $('<tr/>');
-		tr.append("<td class=highLightRow title=Total  colspan=4>" + "Total"
-				+ "</td>");
-
-		tr.append("<td class=highLightRow title=Total>"+ totalPremium.toFixed(2) + "</td>");
-		tr.append("<td class=highLightRow title=Total>"
-				+ totalPremiumLtp.toFixed(2) + "</td>");
-		tr.append("<td class=highLightRow title=Total>"
-				+ totalChange.toFixed(2) + "</td>");
-
-		var totalPlFinal = parseInt(totalPl);
-
-		if (totalPlFinal > 0) {
-
-			tr.append("<td  class=positiveValue2 >" + totalPlFinal.toFixed(2)
-					+ "</td>");
-		} else {
-
-			tr.append("<td  class=negitiveValue2>" + totalPlFinal.toFixed(2)
-					+ "</td>");
-		}
+		tr.append("<td class=highLightRow title=Total  colspan=7>" + "Total"+ "</td>");
+		tr.append("<td class=highLightRow title=Total>"+ strategy.totalPL.toFixed(2) + "</td>");
+		$('#' + tableID).append(tr);
+		
+		
+		tr = $('<tr/>');
+		tr.append("<td class=highLightRow2 title=Total  colspan=8>"+ "Traded At  [ " + strategy.tradedDay + " ]  &nbsp &nbsp &nbsp  [ "
+				+ strategy.tradedPrice + " ]&nbsp &nbsp &nbsp ["+ strategy.tradedTime +"]  </td>");
 
 		$('#' + tableID).append(tr);
-
-		var today = new Date();
-		var todayDay = weekday[today.getDay()];
-
-		tr = $('<tr/>');
-		tr.append("<td class=highLightRow2 title=Total  colspan=8>"
-				+ "Traded At [ " + todayDay + " ]  &nbsp &nbsp &nbsp  [ "
-				+ strategy.tradeSpotPrice + " ]  </td>");
-
-		$('#' + tableID).append(tr);
-
-		tr = $('<tr/>');
-		tr.append("<td class=highLightRow2 title=Total  colspan=8 align=left>"
-				+ "Total PL : &nbsp [ "
-				+ (strategy.totalPL).toFixed(0)
-				+ " ] &nbsp &nbsp &nbsp  [ "
-				+ strategy.underlying_ltp
-				+ " ] Diff [ "
-				+ (strategy.underlying_ltp - strategy.tradeSpotPrice)
-						.toFixed(1) + " ]" + "-" + strategy.dataUpdatedAt);
-
-		$('#' + tableID).append(tr);
-
+		
+		
+		
 		tr = $('<tr/>');
 		tr.append("<td class=highLightRow2 title=Total  colspan=8 align=left>"
 				+ "Min PL &nbsp : &nbsp [ "
@@ -245,8 +217,8 @@
 				+ " ] &nbsp &nbsp &nbsp  [ "
 				+ strategy.totalPLMinSpot
 				+ " ] Diff [ "
-				+ (strategy.totalPLMinSpot - strategy.tradeSpotPrice)
-						.toFixed(1) + " ]" + "-" + strategy.totalPLMinTime);
+				+ (strategy.totalPLMinSpot - strategy.tradedPrice)
+						.toFixed(1) + " ] " + "-" + strategy.totalPLMinTime);
 
 		$('#' + tableID).append(tr);
 
@@ -257,24 +229,28 @@
 				+ " ] &nbsp &nbsp &nbsp  [ "
 				+ strategy.totalPLMaxSpot
 				+ " ] Diff [ "
-				+ (strategy.totalPLMaxSpot - strategy.tradeSpotPrice)
-						.toFixed(1) + " ]" + "-" + strategy.totalPLMaxTime);
+				+ (strategy.totalPLMaxSpot - strategy.tradedPrice)
+						.toFixed(1) + " ] " + "-" + strategy.totalPLMaxTime);
 
 		$('#' + tableID).append(tr);
-
+		
+		var currentSpotDiff= (strategy.ltp - strategy.tradedPrice)
 		//header
-
 		var table = document.getElementById(tableID);
 		var header = table.createTHead();
 		var row = header.insertRow(0);
 		row.setAttribute("class", "optionHead");
+		
 		var cell = row.insertCell(0);
-
-		cell.innerHTML = "<b>" + strategy.underlying + "</b>";
+		cell.innerHTML = "<b>" + symbole + "</b>";
+		
 		var cell1 = row.insertCell(1);
-		cell1.setAttribute("colspan", "8");
-		cell1.innerHTML = "<b>" + strategy.strategyName + "</b>";
-		console.log(strategy.strategyName)
+		cell1.setAttribute("colspan", "5");
+		cell1.innerHTML = "<b>" + strategy.name + "</b>";
+		
+		var cell2 = row.insertCell(2);
+		cell2.setAttribute("colspan", "2");
+		cell2.innerHTML = "<b>" + "Diff: " +  currentSpotDiff.toFixed(2) + "</b>";
 
 	}
 
@@ -319,15 +295,6 @@
 		return extrinsic
 	}
 
-	var weekday = new Array(7);
-	weekday[0] = "Sunday";
-	weekday[1] = "Monday";
-	weekday[2] = "Tuesday";
-	weekday[3] = "Wednesday";
-	weekday[4] = "Thursday";
-	weekday[5] = "Friday";
-	weekday[6] = "Saturday";
-
 	function createDiv(index) {
 		var x = document.createElement("DIV");
 		x.setAttribute("id", "sdDiv" + index);
@@ -337,8 +304,8 @@
 		var y = document.createElement("hr");
 		$("#sdDiv" + index).append(y);
 	}
-
-	function createSDTable(index) {
+	
+	function createPLTable(index) {
 		var x = document.createElement("TABLE");
 		x.setAttribute("id", "sdTable" + index);
 		x.setAttribute("class", "table-striped");
@@ -356,13 +323,15 @@
 
 								+ '<tr class="optionHead">'
 
-								+ '<th title="buyValue">Type</th><th title="buyValue">Expiry</th>   <th title="SellValue"> Qty </th> <th title="SellValue"> Strike </th><th title="net" class=whiteRightBorder > Entry Price</th>'
+								+ ' <th title="buyValue">TradeType</th> <th title="SellValue"> Qty </th> <th title="buyValue">Symbole</th>  <th title="buyValue"> Expiry </th>  ' 
+								+ '<th title="net" class=whiteRightBorder > Entry Price</th> '
 								+ '<th title="buyValue">Current Price</th> <th title="SellValue"> Change </th><th title="net" class=whiteRightBorder > P&L</th>'
 
 								+ '</tr>' + '</thead>');
 
 		// table Fotter 
 	}
+
 </script>
 
 </html>
