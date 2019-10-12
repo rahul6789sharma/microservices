@@ -8,7 +8,15 @@ public class NSEHolidayUtils {
 	private static List<String> holiday = new ArrayList<>();
 
 	static {
-		holiday.add("25-Dec-2018");
+
+		holiday.add("10-Sep-2019");
+		holiday.add("02-Oct-2019");
+		holiday.add("08-Oct-2019");
+
+		holiday.add("28-Oct-2019");
+		holiday.add("12-Nov-2019");
+		holiday.add("25-Dec-2019");
+
 	}
 
 	public static boolean isHoliday() {

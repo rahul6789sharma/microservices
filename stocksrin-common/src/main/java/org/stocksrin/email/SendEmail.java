@@ -17,7 +17,7 @@ import org.stocksrin.common.utils.DateUtils;
 
 public class SendEmail {
 	private static boolean sendEmail = true;
-	private static String toMail = "stocksrin@gmail.com";
+	private static String toMail = "stocksrin2@gmail.com";
 	static String hostName;
 
 	static {
@@ -28,8 +28,14 @@ public class SendEmail {
 		}
 	}
 
+	public static void sentMailimp(String subject, String body, String msName) {
+		toMail = "rahul6789sharma@gmail.com";
+		sentMail(subject, body, msName);
+
+	}
+
 	public static void sentMail(String subject, String body, String msName) {
-		if (hostName.contains("RAHULKSH")) {
+		if (hostName.contains("BLRDL-PC0W67KX")) {
 			// dont send events
 			return;
 		}

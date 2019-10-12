@@ -17,17 +17,17 @@ public class HTMLPageDocumentDownloader {
 				return Jsoup.connect(url).get();
 			} catch (IOException e) {
 				try {
-					Thread.sleep(30000);
+					Thread.sleep(3000);
 				} catch (InterruptedException e1) {
-					System.out.println("");
 					e1.printStackTrace();
 				}
 				retryCounter++;
-				System.out.println("FAILED - Command failed on retry " + retryCounter + " of " + RETRY + " error: " + e);
-				e.printStackTrace();
-				if (retryCounter >= 3) {
+				System.out.println("FAILED - Command failed on retry " + retryCounter + " of " + RETRY + " error: " + e + "\n url :" + url);
+
+				if (retryCounter >= RETRY) {
 					System.out.println("Max retries exceeded.");
 				}
+
 			}
 		}
 		throw new RuntimeException("Command failed on all of 3 retries, url " + url);

@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.stocksrin.common.model.FIIDIIDataModle;
-import org.stocksrin.common.model.strategies.Strategy;
-import org.stocksrin.common.model.strategies.StrategyModel;
+import org.stocksrin.common.model.trade.Strategy;
+import org.stocksrin.common.model.trade.StrategyModel;
 
 public class CommonUtils {
 
@@ -26,6 +26,7 @@ public class CommonUtils {
 		try {
 			createStrategyFile(dir, strategy, fileName);
 			List<StrategyModel> lst = strategy.getStrategyModels();
+
 			StringBuilder string = new StringBuilder();
 			string.append(line + "\n");
 			double totalPremium = 0.0;
@@ -83,7 +84,8 @@ public class CommonUtils {
 			throw new RuntimeException(fileName + " File not exist");
 		}
 
-		try (FileWriter fw = new FileWriter(file.getAbsoluteFile(), true); BufferedWriter bw = new BufferedWriter(fw);) {
+		try (FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
+				BufferedWriter bw = new BufferedWriter(fw);) {
 
 			bw.write("\n" + data);
 
@@ -93,7 +95,7 @@ public class CommonUtils {
 		}
 	}
 
-	// ll not read rirst row
+	// ll not read first row
 	public static List<String[]> getCSVData(String csvFile) {
 
 		String line = "";

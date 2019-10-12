@@ -1,6 +1,7 @@
 package org.stocksrin.common.model.option;
 
 public class OptionModle {
+
 	private Integer c_oi;
 	private Integer c_change_oi;
 	private Integer c_volume;
@@ -113,59 +114,48 @@ public class OptionModle {
 				if (!value.equals("-")) {
 					this.c_change_oi = Integer.valueOf(Integer.parseInt(value.replace(",", "")));
 				}
-			} else if (i != 3) {
-				if (i == 4) {
-					if (!value.equals("-")) {
-						this.c_iv = Double.valueOf(Double.parseDouble(value));
-					}
-				} else if (i == 5) {
-					if (!value.equals("-")) {
-						this.c_ltp = Double.valueOf(Double.parseDouble(value.replace(",", "")));
-					}
-				} else if (i != 6) {
-					if (i != 7) {
-						if (i != 8) {
-							if (i != 9) {
-								if (i == 11) {
-									this.strike_price = Double.valueOf(Double.parseDouble(value));
-								} else if (i != 12) {
-									if (i != 13) {
-										if (i != 14) {
-											if (i != 15) {
-												if (i == 16) {
-													if (!value.equals("-")) {
-														this.p_net_change = Double.valueOf(Double.parseDouble(value.replace(",", "")));
-													}
-												} else if (i == 17) {
-													if (!value.equals("-")) {
-														this.p_ltp = Double.valueOf(Double.parseDouble(value.replace(",", "")));
-													}
-												} else if (i == 18) {
-													if (!value.equals("-")) {
-														this.p_iv = Double.valueOf(Double.parseDouble(value));
-													}
-												} else if (i != 19) {
-													if (i == 20) {
-														if (!value.equals("-")) {
-															this.p_change_oi = Integer.valueOf(Integer.parseInt(value.replace(",", "")));
-														}
-													} else if (i == 21) {
-														if (!value.equals("-")) {
-															this.p_oi = Integer.valueOf(Integer.parseInt(value.replace(",", "")));
-														}
-													} else if (i != 22) {
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
+			} else if (i == 3) {
+				if (!value.equals("-")) {
+					this.c_volume = Integer.valueOf(Integer.parseInt(value.replace(",", "")));
 				}
+			} else if (i == 4) {
+				if (!value.equals("-")) {
+					this.c_iv = Double.valueOf(Double.parseDouble(value));
+				}
+			} else if (i == 5) {
+				if (!value.equals("-")) {
+					this.c_ltp = Double.valueOf(Double.parseDouble(value.replace(",", "")));
+				}
+			} else if (i == 11) {
+				this.strike_price = Double.valueOf(Double.parseDouble(value));
+			} else if (i == 16) {
+				if (!value.equals("-")) {
+					this.p_net_change = Double.valueOf(Double.parseDouble(value.replace(",", "")));
+				}
+			} else if (i == 17) {
+				if (!value.equals("-")) {
+					this.p_ltp = Double.valueOf(Double.parseDouble(value.replace(",", "")));
+				}
+			} else if (i == 18) {
+				if (!value.equals("-")) {
+					this.p_iv = Double.valueOf(Double.parseDouble(value));
+				}
+			} else if (i == 19) {
+				if (!value.equals("-")) {
+					this.p_volume = Integer.valueOf(Integer.parseInt(value.replace(",", "")));
+				}
+			} else if (i == 20) {
+				if (!value.equals("-")) {
+					this.p_change_oi = Integer.valueOf(Integer.parseInt(value.replace(",", "")));
+				}
+			} else if (i == 21) {
+				if (!value.equals("-")) {
+					this.p_oi = Integer.valueOf(Integer.parseInt(value.replace(",", "")));
+				}
+			} else if (i != 22) {
 			}
 		}
+
 	}
 
 	public Integer getC_oi() {
@@ -281,6 +271,15 @@ public class OptionModle {
 	 * ", p_volume=" + this.p_volume + ", p_change_oi=" + this.p_change_oi +
 	 * ", p_oi=" + this.p_oi + "]"; }
 	 */
+
+	@Override
+	public String toString() {
+		return "OptionModle [c_oi=" + c_oi + ", c_change_oi=" + c_change_oi + ", c_volume=" + c_volume + ", c_iv="
+				+ c_iv + ", c_ltp=" + c_ltp + ", c_net_change=" + c_net_change + ", strike_price=" + strike_price
+				+ ", p_net_change=" + p_net_change + ", p_ltp=" + p_ltp + ", p_iv=" + p_iv + ", p_volume=" + p_volume
+				+ ", p_change_oi=" + p_change_oi + ", p_oi=" + p_oi + ", c_oiLimits=" + c_oiLimits + ", p_oiLimits="
+				+ p_oiLimits + "]";
+	}
 
 	public Integer getC_oiLimits() {
 		return c_oiLimits;

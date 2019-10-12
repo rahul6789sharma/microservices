@@ -11,9 +11,9 @@ import java.util.concurrent.TimeUnit;
 public class DateUtils {
 	public static void main(String[] args) {
 		try {
-			
+
 			System.out.println(getCurrentDay());
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

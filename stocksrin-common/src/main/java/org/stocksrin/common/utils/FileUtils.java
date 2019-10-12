@@ -13,11 +13,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import org.stocksrin.common.model.future.Future;
+import org.stocksrin.common.model.option.OptionModles;
+import org.stocksrin.common.model.trade.Strategy2;
+import org.stocksrin.strategy.db.model.StrategyEntity;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -26,17 +32,121 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class FileUtils {
 
 	public static void main(String[] args) {
-		System.out.println(yesterday());
-		System.out.println(today());
-		System.out.println(new Date());
-		long diff = yesterday().getTime() - today().getTime();
-		System.out.println("Days: " + TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS));
+		deletedContaningfiles(AppConstant.STOCKSRIN_STRATEGY_DIR_IntraDay_NIFTY, "Expiry");
+
+	}
+
+	public static void deletedContaningfiles(String path, String keyworld) {
+		List<String> files = listFilesForFolder(path);
+		for (String string : files) {
+			if (string.contains(keyworld))
+
+				delete(AppConstant.STOCKSRIN_STRATEGY_DIR_IntraDay_NIFTY + string);
+
+		}
+
+	}
+
+	private static String getMonthly(List<String> expires) throws Exception {
+		// String todayDate = DateUtils.dateToString(new Date(), "ddMMMyyyy");
+		String todayDate = "30May2019";
+		String currentExpiry = expires.get(0);
+		String currentExpiryMonth = null;
+
+		if (todayDate.equalsIgnoreCase(currentExpiry)) {
+			// System.out.println("today is Expiry");
+			currentExpiryMonth = currentExpiry.replaceAll("[^A-Za-z]", "");
+			System.out.println(currentExpiryMonth);
+		}
+
+		int index = 0;
+		for (String string : expires) {
+			if (string.toUpperCase().contains(currentExpiryMonth)) {
+				index++;
+			}
+		}
+		System.out.println(expires.get(index - 1));
+		System.out.println(index);
+		return expires.get(index - 1);
+
 	}
 
 	public static String lasFilePath(String dir) {
 		List<String> lst = FileUtils.listFilesForFolder(new File(dir));
 		String path = dir + lst.get(lst.size() - 1);
 		return path;
+	}
+
+	public static OptionModles fromJson2(String file) throws Exception {
+		ObjectMapper mapper = new ObjectMapper();
+
+		try {
+			OptionModles data = mapper.readValue(new File(file), OptionModles.class);
+			return data;
+
+		} catch (JsonGenerationException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public static Future from(String dataa, Future future) throws Exception {
+		ObjectMapper mapper = new ObjectMapper();
+
+		try {
+			Future data = mapper.readValue(dataa, Future.class);
+			return data;
+
+		} catch (JsonGenerationException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public static StrategyEntity fromJsonStrategy2(String file) throws Exception {
+		ObjectMapper mapper = new ObjectMapper();
+
+		try {
+			StrategyEntity data = mapper.readValue(new File(file), StrategyEntity.class);
+			return data;
+
+		} catch (JsonGenerationException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println("returning null");
+		return null;
+	}
+
+	public static Strategy2 fromJsonStrategy(String file) throws Exception {
+		ObjectMapper mapper = new ObjectMapper();
+
+		try {
+			Strategy2 data = mapper.readValue(new File(file), Strategy2.class);
+			return data;
+
+		} catch (JsonGenerationException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println("returning null");
+		return null;
 	}
 
 	public static Object fromJson(String file) throws Exception {
@@ -53,13 +163,14 @@ public class FileUtils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		System.out.println("returning null");
 		return null;
 	}
 
-
 	public static void writeDataAsJson(Object data, String fileName) {
-		ObjectMapper mapper = new ObjectMapper();
 		try {
+			ObjectMapper mapper = new ObjectMapper();
+
 			File file = new File(fileName);
 			mapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
 		} catch (Exception e) {
@@ -108,6 +219,12 @@ public class FileUtils {
 	private static Date today() {
 		final Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("IST"));
 		return cal.getTime();
+	}
+
+	public static String nextMonth() {
+		final Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("IST"));
+		cal.add(Calendar.MONTH, 1);
+		return months[cal.getTime().getMonth()];
 	}
 
 	public static boolean isYestardaysFileExist(String filePath) throws Exception {
@@ -177,8 +294,23 @@ public class FileUtils {
 		return false;
 	}
 
+	public static List<String> listdir(String path) {
+		File dir = new File(path);
+		File[] c = dir.listFiles();
+		List<File> subDirList = Arrays.asList(c);
+		List<String> subDirName = subDirList.stream().map(i -> i.getName()).collect(Collectors.toList());
+		return subDirName;
+	}
+
+	public static List<String> listFilesForFolder(String folder) {
+		return listFilesForFolder(new File(folder));
+	}
+
 	public static List<String> listFilesForFolder(File folder) {
 		List<String> names = new ArrayList<>();
+		if (!folder.exists()) {
+			return null;
+		}
 		for (File fileEntry : folder.listFiles()) {
 			if (fileEntry.isDirectory()) {
 				listFilesForFolder(fileEntry);
@@ -217,4 +349,6 @@ public class FileUtils {
 		File file = new File(filepath);
 		return file.exists();
 	}
+
+	private static String[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 }

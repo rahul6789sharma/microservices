@@ -11,6 +11,8 @@ public class OptionModles implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	private String date;
+	private int dte;
+	private String day;
 	private String expiry;
 	private List<String> expiryList = new ArrayList<>();
 	private String lastDataUpdated;
@@ -24,6 +26,9 @@ public class OptionModles implements Serializable {
 	private int total_ce_oi;
 	private int total_pe_oi;
 
+	private int total_ce_volume;
+	private int total_pe_volume;
+
 	private int total_ce_oi_change;
 	private int total_pe_oi_change;
 
@@ -32,7 +37,28 @@ public class OptionModles implements Serializable {
 
 	// used in usdInr
 	private FuturePrice futurePrice;
-	
+
+	private Double atmStrike;
+	private Double iv;
+	private Double pe_atm_iv;
+	private Double ce_atm_iv;
+
+	public int getTotal_ce_volume() {
+		return total_ce_volume;
+	}
+
+	public void setTotal_ce_volume(int total_ce_volume) {
+		this.total_ce_volume = total_ce_volume;
+	}
+
+	public int getTotal_pe_volume() {
+		return total_pe_volume;
+	}
+
+	public void setTotal_pe_volume(int total_pe_volume) {
+		this.total_pe_volume = total_pe_volume;
+	}
+
 	public int getTotal_ce_oi() {
 		return this.total_ce_oi;
 	}
@@ -159,6 +185,54 @@ public class OptionModles implements Serializable {
 
 	public void setFuturePrice(FuturePrice futurePrice) {
 		this.futurePrice = futurePrice;
+	}
+
+	public Double getAtmStrike() {
+		return atmStrike;
+	}
+
+	public void setAtmStrike(Double atmStrike) {
+		this.atmStrike = atmStrike;
+	}
+
+	public Double getIv() {
+		return iv;
+	}
+
+	public void setIv(Double iv) {
+		this.iv = iv;
+	}
+
+	public Double getPe_atm_iv() {
+		return pe_atm_iv;
+	}
+
+	public void setPe_atm_iv(Double pe_atm_iv) {
+		this.pe_atm_iv = pe_atm_iv;
+	}
+
+	public Double getCe_atm_iv() {
+		return ce_atm_iv;
+	}
+
+	public void setCe_atm_iv(Double ce_atm_iv) {
+		this.ce_atm_iv = ce_atm_iv;
+	}
+
+	public String getDay() {
+		return day;
+	}
+
+	public void setDay(String day) {
+		this.day = day;
+	}
+
+	public int getDte() {
+		return dte;
+	}
+
+	public void setDte(int dte) {
+		this.dte = dte;
 	}
 
 	public String toString() {

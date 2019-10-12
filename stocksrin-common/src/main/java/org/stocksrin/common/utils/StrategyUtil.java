@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.stocksrin.common.model.option.OptionType;
-import org.stocksrin.common.model.strategies.Strategy;
-import org.stocksrin.common.model.strategies.Strategy.UnderLying;
-import org.stocksrin.common.model.strategies.StrategyModel;
+import org.stocksrin.common.model.trade.Strategy;
+import org.stocksrin.common.model.trade.StrategyModel;
+import org.stocksrin.common.model.trade.UnderLyingInstrument;
 
 public class StrategyUtil {
 
@@ -29,13 +29,13 @@ public class StrategyUtil {
 			}
 
 			String underlaying = string.split("_")[1];
-			UnderLying underLyingName = UnderLying.OTHERS;
+			UnderLyingInstrument underLyingName = UnderLyingInstrument.OTHERS;
 			if (underlaying.equals("BANKNIFTY.csv")) {
-				underLyingName = UnderLying.BANKNIFTY;
+				underLyingName = UnderLyingInstrument.BANKNIFTY;
 			} else if (underlaying.equals("NIFTY.csv")) {
-				underLyingName = UnderLying.NIFTY;
+				underLyingName = UnderLyingInstrument.NIFTY;
 			} else if (underlaying.equals("USDINR.csv")) {
-				underLyingName = UnderLying.USDINR;
+				underLyingName = UnderLyingInstrument.USDINR;
 			}
 			Strategy strategy = new Strategy(underLyingName);
 			if (data != null) {

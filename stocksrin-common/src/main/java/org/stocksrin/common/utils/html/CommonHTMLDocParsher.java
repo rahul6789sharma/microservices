@@ -27,26 +27,29 @@ public class CommonHTMLDocParsher {
 		return null;
 	}
 
+	public static void getFuture() {
+	}
+
 	public static FuturePrice getUSDINRFuturefromJsonString(String jsonData) {
 		FuturePrice futurePrice = new FuturePrice();
 		// System.out.println("jsonData " + jsonData);
 
 		String a = jsonData.split("buyPrice1\":\"")[1].split("\",")[0];
-		//System.out.println(a);
+		// System.out.println(a);
 		futurePrice.setLastPrice(Double.parseDouble(a));
-		//System.out.println("UsdInrFuture " + futurePrice);
+		// System.out.println("UsdInrFuture " + futurePrice);
 
 		return futurePrice;
 	}
 
-	public static OptionModles parseNSEColumn(Document doc, Elements rows) {
+	public static OptionModles parseNSEColumn(Document doc, Elements rows, String symbole) {
 		List<OptionModle> lst = parseOptionTableColumn(doc, rows);
 		OptionModles result = updateTotalOI(doc, lst);
 		try {
 			Elements elements = getTable(doc, 0);
 			String spotString = getSpotPrice(elements);
 			result.setUnderlyingSpotPriceString(spotString);
-			result.setSpot(parseSpot(spotString));
+			result.setSpot(parseSpot(spotString, symbole));
 			result.setDate(getDate(spotString));
 			result.setLastDataUpdated(getLastUpdate(spotString));
 		} catch (Exception e) {
@@ -71,6 +74,11 @@ public class CommonHTMLDocParsher {
 		return result;
 	}
 
+	public static String div(Document doc, String divID) {
+		Element table = (Element) doc.select("div[id=" + divID + "]").get(0);
+		return table.ownText();
+	}
+
 	public static Elements getOptionChainTable(Document doc, String id, int index) throws Exception {
 		Element table = (Element) doc.select("table[id=" + id + "]").get(0);
 		Elements rows = table.select("tr");
@@ -92,7 +100,8 @@ public class CommonHTMLDocParsher {
 			e.printStackTrace();
 		}
 		if (lst.isEmpty()) {
-			throw new Exception("Expiry Select Box broken! Check expiry Select Box in web Page, ID does not exists : " + id);
+			throw new Exception(
+					"Expiry Select Box broken! Check expiry Select Box in web Page, ID does not exists : " + id);
 		}
 		return lst;
 	}
@@ -155,25 +164,37 @@ public class CommonHTMLDocParsher {
 		int total_ce_oi_change = 0;
 		int total_pe_oi_change = 0;
 
-		for (OptionModle c : column) {
+		int total_ce_volume = 0;
+		int total_pe_volume = 0;
 
-			if (c.getC_oi() != null) {
-				total_ce_oi += c.getC_oi().intValue();
+		for (OptionModle col : column) {
+
+			if (col.getC_volume() != null) {
+				total_ce_volume += col.getC_volume();
+			}
+			if (col.getP_volume() != null) {
+				total_pe_volume += col.getP_volume();
 			}
 
-			if (c.getP_oi() != null) {
-				total_pe_oi += c.getP_oi().intValue();
+			if (col.getC_oi() != null) {
+				total_ce_oi += col.getC_oi().intValue();
 			}
 
-			if (c.getC_change_oi() != null) {
-				total_ce_oi_change += c.getC_change_oi().intValue();
+			if (col.getP_oi() != null) {
+				total_pe_oi += col.getP_oi().intValue();
 			}
 
-			if (c.getP_change_oi() != null) {
-				total_pe_oi_change += c.getP_change_oi().intValue();
+			if (col.getC_change_oi() != null) {
+				total_ce_oi_change += col.getC_change_oi().intValue();
+			}
+
+			if (col.getP_change_oi() != null) {
+				total_pe_oi_change += col.getP_change_oi().intValue();
 			}
 
 		}
+		columns.setTotal_ce_volume(total_ce_volume);
+		columns.setTotal_pe_volume(total_pe_volume);
 		columns.setTotal_ce_oi(total_ce_oi);
 		columns.setTotal_pe_oi(total_pe_oi);
 
@@ -196,9 +217,10 @@ public class CommonHTMLDocParsher {
 		return result;
 	}
 
-	private static Double parseSpot(String spot) {
+	private static Double parseSpot(String spot, String symbole) {
 		String[] arru = spot.split("As on");
-		String[] c = arru[0].trim().split("NIFTY");
+		String[] c = arru[0].trim().split(symbole);
+		// String[] c = arru[0].trim().split("NIFTY");
 		String d = c[1];
 
 		int length = d.length();
